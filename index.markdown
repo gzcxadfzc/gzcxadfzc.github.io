@@ -3,9 +3,8 @@ layout: home
 profile_picture:
   src: /assets/img/user/my-notion-face-portrait.png
   alt: website picture
-title: ~~~하는 녀석
-subtitle: Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. I
-description: ~~~인놈
+title: 백엔드 개발자 박순용 입니다.
+subtitle: 다양한 기술과 지식을 통해 육각형 인간이 되고 싶은 개발자 입니다.
 social:
   - name: github
     url: https://github.com/gzcxadfzc
@@ -89,28 +88,6 @@ contact: yongsa0221@gmail.com
 - 앱: `Dart/Flutter`
 - 데이터베이스: `Mysql`, `JPA/hibernate`
 - 배포: `AWS EC2`
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
-## dd
-<br>
-<br>
-<br>
-<br>
-<br>
-
-## dd 
-
 
 </div>
 
