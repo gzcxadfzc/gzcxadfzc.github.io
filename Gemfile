@@ -2,8 +2,6 @@ source "https://rubygems.org"
 
 gem "jekyll", "~> 4.4.1"
 
-gem "bay_jekyll_theme", "1.2.2"
-
 group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.12"
 end
