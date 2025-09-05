@@ -55,19 +55,19 @@ contact: yongsa0221@gmail.com
 <br>
 
 ### 주요 기능
-[Redis 기반 생성형 AI context 유지]()
+[Redis 기반 생성형 AI context 유지](/404.html)
 
-[동화 생성을 위한 생성형 AI 프롬프팅 및 요청 파이프라인 구성]()
+[동화 생성을 위한 생성형 AI 프롬프팅 및 요청 파이프라인 구성](/404.html)
 
-[계층형 구조]()
+[계층형 구조](/404.html)
 
-[Spring Security기반 Oauth 인증]()
+[Spring Security기반 Oauth 인증](/404.html)
 
 ---
 
 <br>
 
-## Barlow _[API서버]()_, _[앱]()_
+## Barlow _[API서버](/404.html)_, _[앱](/404.html)_
 > ### 국회 법안 조회 서비스
 >- 기간: 2025.1 ~  
 >- 인원: 2명
@@ -88,20 +88,20 @@ contact: yongsa0221@gmail.com
 
 **API server - Java/Spring**
 
-[공통 인증 모듈 구현]()
+[공통 인증 모듈 구현](/404.html)
 
-[생성형 AI요약 Batch작업 최적화]()
+[생성형 AI요약 Batch작업 최적화](/404.html)
 
-[DDD 기반 Clean architecture]() 
+[DDD 기반 Clean architecture](/404.html) 
 
-[CQRS 패턴을 통한 조회 API 구현]()
+[CQRS 패턴을 통한 조회 API 구현](/404.html)
 
 <br>
 
 **Application - Dart/Flutter**
 
-[Github actions를 통한 Play Store 트랙 자동 배포 환경 구성]()
+[Github actions를 통한 Play Store 트랙 자동 배포 환경 구성](/404.html)
 
-[feature-first 구조에 따른 Clean Architecture구조]()
+[feature-first 구조에 따른 Clean Architecture구조](/404.html)
 
-[멀티 모듈을 통한 빌드 속도 개선]()
+[멀티 모듈을 통한 빌드 속도 개선](/404.html)
