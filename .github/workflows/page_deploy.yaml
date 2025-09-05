@@ -49,6 +49,24 @@ jobs:
           bundle exec jekyll b \
             --baseurl "${{ steps.pages.outputs.base_path }}" \
             -d "_site${{ steps.pages.outputs.base_path }}"
+      
+      - name: Test CSS file exists
+        run: |
+          echo "Checking for CSS file..."
+          ls -la "_site${{ steps.pages.outputs.base_path }}/assets/css/"
+          if [ -f "_site${{ steps.pages.outputs.base_path }}/assets/css/main.css" ]; then
+            echo "✓ CSS file exists"
+          else
+            echo "✗ CSS file not found"
+            exit 1
+          fi
+          
+      - name: Test CSS content
+        run: |
+          echo "Checking CSS file size and content..."
+          wc -c "_site${{ steps.pages.outputs.base_path }}/assets/css/main.css"
+          head -n 5 "_site${{ steps.pages.outputs.base_path }}/assets/css/main.css"
+          
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
