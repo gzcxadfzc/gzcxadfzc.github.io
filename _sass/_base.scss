@@ -2,6 +2,25 @@
 @use "mixins" as mixins;
 @use "extends";
 
+@media print {
+  /* 페이지 쪼개짐 방지 */
+  .no-break { 
+    break-inside: avoid;
+    page-break-inside: avoid; /* 구형 호환 */
+  }
+  img, table, pre, blockquote { 
+    break-inside: avoid; 
+    page-break-inside: avoid; 
+  }
+
+  /* 인쇄에 불필요한 UI 숨김 (필요에 맞게 조정) */
+  #printPDF, header, .site-header, .site-footer { display: none !important; }
+
+  /* 여백/폭 */
+  @page { margin: 16mm; }
+  .page-content, .wrapper { max-width: 100% !important; }
+}
+
 /**
  * Custom Fonts
  */

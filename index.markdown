@@ -21,37 +21,41 @@ techStacks:
 certificates:
 contact: yongsa0221@gmail.com 
 ---
-
----
-<br>
+<div class="no-break" markdown="1">
 
 ## 학업
 > 숭실대학교 글로벌미디어학부 : 2019 ~ 졸업예정
+</div>
 
 <br>
 
-
+<div class="no-break" markdown="1">
 # 프로젝트
-
 ---
+</div>
 
+<div class="no-break" markdown="1">
 <br>
 
-##  [LittleWriter](https://github.com/LittleWriterBloom/BE)
+## [LittleWriter](https://github.com/LittleWriterBloom/BE)
 
->### 생성형 AI를 사용한 동화 제작 서비스
->- 기간: 2024.1 ~ 2024.6 
->- 인원: 3명
->- 현재 상태: 중단
->- 역할:  api 서버 개발
+> ### 생성형 AI를 사용한 동화 제작 서비스
+> - 기간: 2024.1 ~ 2024.6 
+> - 인원: 3명
+> - 현재 상태: 중단
+> - 역할: api 서버 개발
+</div>
 
+<div class="no-break" markdown="1">
 <br>
 
 ### 사용
-- API서버: `Java`,`Spring Boot`
+- API서버: `Java`, `Spring Boot`
 - 데이터베이스: `Mysql`, `JPA/hibernate`, `Redis`
 - 배포: `AWS EC2`, `Docker`
+</div>
 
+<div class="no-break" markdown="1">
 <br>
 
 ### 주요 기능
@@ -64,24 +68,30 @@ contact: yongsa0221@gmail.com
 [Spring Security기반 Oauth 인증](/404.html)
 
 ---
+</div>
 
+<div class="no-break" markdown="1">
 <br>
 
 ## Barlow _[API서버](/404.html)_, _[앱](/404.html)_
 > ### 국회 법안 조회 서비스
->- 기간: 2025.1 ~  
->- 인원: 2명
->- [Google Play](https://play.google.com/store/apps/details?id=com.barlow.front) 배포중
->- 역할:  api서버 개발, 앱 개발 및 스토어 관리
+> - 기간: 2025.1 ~  
+> - 인원: 2명
+> - [Google Play](https://play.google.com/store/apps/details?id=com.barlow.front) 배포중
+> - 역할: api서버 개발, 앱 개발 및 스토어 관리
+</div>
 
+<div class="no-break" markdown="1">
 <br>
 
 ### 사용
 - API서버: `Java/Spring Boot`
 - 앱: `Dart/Flutter`
 - 데이터베이스: `Mysql`, `JPA/hibernate`
-- 배포: `AWS EC2`, 
+- 배포: `AWS EC2`
+</div>
 
+<div class="no-break" markdown="1">
 <br>
 
 ### 주요 기능
@@ -95,7 +105,9 @@ contact: yongsa0221@gmail.com
 [DDD 기반 Clean architecture](/404.html) 
 
 [CQRS 패턴을 통한 조회 API 구현](/404.html)
+</div>
 
+<div class="no-break" markdown="1">
 <br>
 
 **Application - Dart/Flutter**
@@ -105,3 +117,4 @@ contact: yongsa0221@gmail.com
 [feature-first 구조에 따른 Clean Architecture구조](/404.html)
 
 [멀티 모듈을 통한 빌드 속도 개선](/404.html)
+</div>
