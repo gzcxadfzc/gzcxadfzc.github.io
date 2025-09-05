@@ -4,7 +4,7 @@ profile_picture:
   src: /assets/img/user/my-notion-face-portrait.png
   alt: website picture
 title: ~~~하는 녀석
-subtitle: ~~~입니다
+subtitle: Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. I
 description: ~~~인놈
 social:
   - name: github
@@ -89,6 +89,29 @@ contact: yongsa0221@gmail.com
 - 앱: `Dart/Flutter`
 - 데이터베이스: `Mysql`, `JPA/hibernate`
 - 배포: `AWS EC2`
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+## dd
+<br>
+<br>
+<br>
+<br>
+<br>
+
+## dd 
+
+
 </div>
 
 <div class="no-break" markdown="1">

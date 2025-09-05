@@ -13,7 +13,6 @@
     page-break-inside: avoid; 
   }
 
-  /* 인쇄에 불필요한 UI 숨김 (필요에 맞게 조정) */
   #printPDF, header, .site-header, .site-footer { display: none !important; }
 
   /* 여백/폭 */
