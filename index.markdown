@@ -21,6 +21,10 @@ techStacks:
 certificates:
 contact: yongsa0221@gmail.com 
 ---
+
+---
+<br>
+
 ## 학업
 > 숭실대학교 글로벌미디어학부 : 2019 ~ 졸업예정
 
@@ -41,6 +45,7 @@ contact: yongsa0221@gmail.com
 >- 현재 상태: 중단
 >- 역할:  api 서버 개발
 
+<br>
 
 ### 사용
 - API서버: `Java`,`Spring Boot`
@@ -57,8 +62,6 @@ contact: yongsa0221@gmail.com
 [계층형 구조]()
 
 [Spring Security기반 Oauth 인증]()
-
-<br>
 
 ---
 
@@ -92,6 +95,8 @@ contact: yongsa0221@gmail.com
 [DDD 기반 Clean architecture]() 
 
 [CQRS 패턴을 통한 조회 API 구현]()
+
+<br>
 
 **Application - Dart/Flutter**
 

@@ -52,10 +52,8 @@
                 {% endfor %}
               </div>
             {% endif %}
-            <br>
           </div>
         </div>
-        <hr/>
       </div>
     </div>
     
@@ -67,7 +65,140 @@
       </div>
     </div>
 
+    <!-- PDF 출력 버튼 -->
+    <div style="text-align: center; padding: 20px;">
+      <button id="printPDF" style="
+        background-color: #007cba;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      " onmouseover="this.style.backgroundColor='#005a87'" onmouseout="this.style.backgroundColor='#007cba'">
+        📄 PDF로 내보내기
+      </button>
+    </div>
+
     {% include footer.html %}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <script>
+      document.getElementById('printPDF').addEventListener('click', function() {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        
+        // 모든 컨텐츠를 포함할 요소들을 선택
+        const homeContent = document.querySelector('.home');
+        const pageContentDetails = document.querySelector('.page-content-details');
+        
+        let currentYPosition = 10;
+        const pageHeight = pdf.internal.pageSize.height;
+        const pageWidth = pdf.internal.pageSize.width;
+        const margin = 10;
+        const maxContentHeight = pageHeight - 2 * margin;
+        
+        function addSectionToPDF(element) {
+          return new Promise((resolve) => {
+            html2canvas(element, {
+              scale: 2,
+              useCORS: true,
+              allowTaint: true
+            }).then(canvas => {
+              const imgData = canvas.toDataURL('image/png');
+              const imgWidth = pageWidth - 2 * margin;
+              const imgHeight = (canvas.height * imgWidth) / canvas.width;
+              
+              // 섹션이 현재 페이지에 들어갈 수 없으면 새 페이지 생성
+              if (currentYPosition + imgHeight > pageHeight - margin) {
+                pdf.addPage();
+                currentYPosition = margin;
+              }
+              
+              pdf.addImage(imgData, 'PNG', margin, currentYPosition, imgWidth, imgHeight);
+              currentYPosition += imgHeight + 2;
+              
+              resolve();
+            });
+          });
+        }
+        
+        // 첫 번째로 홈 섹션 추가
+        addSectionToPDF(homeContent).then(() => {
+          
+          // 페이지 컨텐츠의 내용을 <br> 기준으로 분리하여 처리
+          const contentHTML = pageContentDetails.innerHTML;
+          const sections = contentHTML.split('<br>').filter(section => section.trim() !== '');
+          
+          let sectionIndex = 0;
+          
+          function procesNextSection() {
+            if (sectionIndex >= sections.length) {
+              pdf.save('포트폴리오.pdf');
+              return;
+            }
+            
+            const section = sections[sectionIndex];
+            
+            // 각 섹션을 임시 div에 넣어서 렌더링
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = section;
+            tempDiv.style.cssText = `
+              position: absolute;
+              left: -9999px;
+              top: 0;
+              width: ${(pageWidth - 2 * margin) * 3.779527559}px;
+              font-family: inherit;
+              font-size: 14px;
+              line-height: 1.6;
+              color: #333;
+              padding: 10px;
+              background: white;
+            `;
+            document.body.appendChild(tempDiv);
+            
+            // 섹션 높이 측정
+            html2canvas(tempDiv, {
+              scale: 1,
+              useCORS: true,
+              allowTaint: true
+            }).then(canvas => {
+              const imgWidth = pageWidth - 2 * margin;
+              const imgHeight = (canvas.height * imgWidth) / canvas.width;
+              
+              // 섹션이 페이지에 들어갈 수 없으면 새 페이지로
+              if (currentYPosition + imgHeight > pageHeight - margin) {
+                pdf.addPage();
+                currentYPosition = margin;
+              }
+              
+              // 고해상도로 다시 캡처
+              html2canvas(tempDiv, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true
+              }).then(finalCanvas => {
+                const finalImgData = finalCanvas.toDataURL('image/png');
+                const finalImgWidth = pageWidth - 2 * margin;
+                const finalImgHeight = (finalCanvas.height * finalImgWidth) / finalCanvas.width;
+                
+                pdf.addImage(finalImgData, 'PNG', margin, currentYPosition, finalImgWidth, finalImgHeight);
+                currentYPosition += finalImgHeight + 1;
+                
+                document.body.removeChild(tempDiv);
+                sectionIndex++;
+                procesNextSection();
+              });
+            });
+          }
+          
+          procesNextSection();
+        });
+      });
+    </script>
 
     {% include foot.html %}
   </body>
