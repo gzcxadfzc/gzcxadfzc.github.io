@@ -30,7 +30,6 @@ twitter_username: jekyllrb
 github_username:  jekyll
 
 # Build settings
-remote_theme: eliottvincent/bay
 plugins:
   - jekyll-feed
 
