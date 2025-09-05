@@ -8,12 +8,60 @@
     <div class="page-content">
       <div class="wrapper">
         <div class="home">
-          <img
-            src="{{ page.profile_picture.src | absolute_url }}"
-            alt="{{ page.profile_picture.alt }}"
-            class="profile-pic"
-          />
-
+          <div style="float: right; text-align: center; margin-left: 20px;">
+               <img
+                src="{{ page.profile_picture.src | absolute_url }}"
+                alt="{{ page.profile_picture.alt }}"
+                class="profile-pic"
+                />          
+                 {% if page.social %}
+              <div class="social-links" style="margin-top: 25px; text-align: left; margin-left: 20px;">
+                {% for link in page.social %}
+                  <div style="margin-bottom: 8px; margin-right: 10px;">
+                    <img src="{{ '/assets/img/icons/' | append: link.iconName | append: '.png' | absolute_url }}" 
+                         alt="{{ link.iconName }}" 
+                         style="width: 20px; height: 20px; vertical-align: middle;" />
+                    <a href="{{ link.url }}" target="_blank" style="text-decoration: none; color: #333;">{{ link.name }}</a>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %} 
+          </div>
+          <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+            <div>
+              <h1>{{page.title}}</h1>
+              <h3 style="color: #666; width: 300px; font-size: 1.5em; font-weight: 500;">{{page.subtitle}}</h3>
+            </div>
+            <br/>
+            <hr/>
+            <br/>
+            {% if page.techStacks %}
+              <div class="tech-stacks" style="margin-bottom: 30px;">
+                <h2>스킬</h2>
+                {% for category in page.techStacks %}
+                  <div style="margin-bottom: 15px;">
+                    <h3 style="color: #666; margin-bottom: 8px;">{{ category.name }}</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                      {% for tech in category.values %}
+                        <span style="background-color: #f5f5f5; padding: 5px 12px; border-radius: 20px; font-size: 0.9em; color: #333;">
+                          <b>{{ tech }}</b>
+                        </span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+            <br>
+          </div>
+        </div>
+        <hr/>
+      </div>
+    </div>
+    
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="page-content-details">
           {{ content }}
         </div>
       </div>

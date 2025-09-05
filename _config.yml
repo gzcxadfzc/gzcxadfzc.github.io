@@ -50,10 +50,12 @@ sass:
 
 header:
   pages:
-    - name: Home
+    - name: 홈
       slug: /
-    - name: Work
-    - name: Blog
+    - name: 작업
+      slug: /work
+    - name: 글
+      slug: /blog
 
 footer:
   show_powered_by: false

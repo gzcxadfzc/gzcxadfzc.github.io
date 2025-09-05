@@ -18,11 +18,17 @@
               alt="{{ item.image.alt }}"
               class="work-bubble"
             />
-            <span class="work-text">
-              <strong>{{ item.title }}</strong>
-              &mdash;
-              {{ item.description }}
-            </span>
+            <div class="work-item-inner">
+              
+              <span class="work-title">
+                <strong>{{ item.title }}</strong>
+              </span>
+              <div class="work-text">
+                {{ item.description }}
+              </div>
+              <div></div>
+              <a href="{{item.link}}">{{item.link}}</a>
+            </div>
           </div>
           {% endfor %}
         </div>

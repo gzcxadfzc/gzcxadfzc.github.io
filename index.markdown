@@ -3,93 +3,100 @@ layout: home
 profile_picture:
   src: /assets/img/user/my-notion-face-portrait.png
   alt: website picture
+title: ~~~하는 녀석
+subtitle: ~~~입니다
+description: ~~~인놈
+social:
+  - name: github
+    url: https://github.com/gzcxadfzc
+    iconName: github
+  - name: Tistory
+    url: https://yongsa0221.tistory.com/
+    iconName: tistory
+techStacks:
+  - name: 언어/프레임워크
+    values: ["Java/Spring", "Dart/Flutter"]
+  - name: 기타
+    values: ["Mysql"]
+certificates:
+contact: yongsa0221@gmail.com 
 ---
-Github
+## 학업
+> 숭실대학교 글로벌미디어학부 : 2019 ~ 졸업예정
 
-https://github.com/gzcxadfzc
+<br>
 
-Blogs
-
-https://ogongchill.github.io/
-
-https://yongsa0221.tistory.com/
-
-### 기술 스택
-
-- JAVA / Spring
-- Github
-- Github Actions
-- Slack
-- Dart / Flutter
 
 # 프로젝트
 
-## LittleWriter
+---
 
-*생성형 AI를 사용한 동화 제작 서비스*
+<br>
 
-> 프로젝트 기간: 2023.1 ~ 2023.6
-인원: 3명
-현재 상태: 중단
-> 
+##  [LittleWriter](https://github.com/LittleWriterBloom/BE)
 
-역할:  api 서버 개발
+>### 생성형 AI를 사용한 동화 제작 서비스
+>- 기간: 2024.1 ~ 2024.6 
+>- 인원: 3명
+>- 현재 상태: 중단
+>- 역할:  api 서버 개발
 
-https://github.com/LittleWriterBloom/BE
 
-기술 스택
+### 사용
+- API서버: `Java`,`Spring Boot`
+- 데이터베이스: `Mysql`, `JPA/hibernate`, `Redis`
+- 배포: `AWS EC2`, `Docker`
 
-Backend: JAVA / Spring Framework
+<br>
 
-Database: Mysql, jPA/hibernate, Redis
+### 주요 기능
+[Redis 기반 생성형 AI context 유지]()
 
-Cloud: AWS
+[동화 생성을 위한 생성형 AI 프롬프팅 및 요청 파이프라인 구성]()
 
-Docker 배포
+[계층형 구조]()
 
-Redis 기반 생성형 AI context 유지
+[Spring Security기반 Oauth 인증]()
 
-동화 생성을 위한 생성형 AI 프롬프팅 및 요청 파이프라인 구성
+<br>
 
-계층형 구조
+---
 
-Spring Security기반 Oauth 인증
+<br>
 
-## 바로 서비스
+## Barlow _[API서버]()_, _[앱]()_
+> ### 국회 법안 조회 서비스
+>- 기간: 2025.1 ~  
+>- 인원: 2명
+>- [Google Play](https://play.google.com/store/apps/details?id=com.barlow.front) 배포중
+>- 역할:  api서버 개발, 앱 개발 및 스토어 관리
 
-> 바로 서비스는 한국 국회 법안 추적 및 알림 서비스를 제공하는 종합 플랫폼입니다. 사용자가 관심 있는 법안의 진행 상황을 실시간으로 추적하고, 중요한 변경사항에 대해 즉시 알림을 받을 수 있도록 설계되었습니다.
-> 
+<br>
 
-> 프로젝트 기간:  2024.12 ~
-인원: 2명
-현재상태: 운영중
-> 
+### 사용
+- API서버: `Java/Spring Boot`
+- 앱: `Dart/Flutter`
+- 데이터베이스: `Mysql`, `JPA/hibernate`
+- 배포: `AWS EC2`, 
 
-역할: app 개발 및 Play Store 버전관리, api 서버 개발
+<br>
 
-### 기술 스택
-
-**Backend:** JAVA / Spring Framework
-
-App: Dart/Flutter
-Database: MySql, JPA/Hibernate
-Cloud: AWS, Firebase
+### 주요 기능
 
 **API server - Java/Spring**
 
-공통 인증 모듈 구현
+[공통 인증 모듈 구현]()
 
-AI요약 기반 Batch작업 구현
+[생성형 AI요약 Batch작업 최적화]()
 
-DDD 기반 Clean architecture 
+[DDD 기반 Clean architecture]() 
 
-CQRS 패턴을 통한 조회 API 구현
+[CQRS 패턴을 통한 조회 API 구현]()
 
 **Application - Dart/Flutter**
 
-Github actions를 통한 Play Store 트랙 자동 배포 CI/CD 구현
+[Github actions를 통한 Play Store 트랙 자동 배포 환경 구성]()
 
-모노 레포 형식 멀티 모듈을 통한 Clean Architecture 구현
+[feature-first 구조에 따른 Clean Architecture구조]()
 
-멀티 모듈을 통한 빌드 속도 개선
-
+[멀티 모듈을 통한 빌드 속도 개선]()
