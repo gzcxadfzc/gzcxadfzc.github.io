@@ -18,14 +18,14 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: Your awesome title
-email: your-email@example.com
+title: gzcxadfzc's page
+email: yongsa0221@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   Write an awesome description for your new site here. You can edit this
   line in _config.yml. It will appear in your document head meta (for
   Google search results) and in your feed.xml site description.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://gzcxadfzc.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: jekyllrb
 github_username:  jekyll
 
@@ -57,31 +57,22 @@ header:
     - name: Blog
 
 footer:
-  show_powered_by: true
+  show_powered_by: false
   contact:
     - type: email
       name: Email
-      value: yourmail@domain.com
-    - type: wechat
-      value: YourWeChatUsername
-      link: "#"
+      value: yongsa0221@gmail.com
   follow:
-    - type: twitter
-      name: Twitter
-      link: http://twitter.com/YourTwitterUsername
-      username: "@YourTwitterUsername"
-    - type: facebook
-      name: Facebook
-      link: http://facebook.com/YourFacebookUsername
-    - type: linkedin
-      name: LinkedIn
-      link: http://linkedin.com/in/YourLinkedInUsername
+    - type: tistory
+      name: Tistory
+      link: https://yongsa0221.tistory.com/
+    # - type: facebook
+    #   name: Facebook
+    #   link: http://facebook.com/YourFacebookUsername
+    # - type: linkedin
+    #   name: LinkedIn
+    #   link: http://linkedin.com/in/YourLinkedInUsername
     - type: github
       name: GitHub
-      link: http://github.com/YourGitHubUsername
-    - type: dribbble
-      name: Dribbble
-      link: https://dribbble.com/YourDribbbleUsername
-    - type: rss
-      name: RSS
-      link: /feed.xml
+      link: http://github.com/gzcxadfzc
+ 

@@ -18,6 +18,12 @@ group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.12"
 end
 
+# Linux platform dependencies
+platforms :ruby do
+  gem "kramdown-parser-gfm"
+  gem "sassc", "~> 2.4"
+end
+
 # Windows and JRuby does not include zoneinfo files, so bundle the tzinfo-data gem
 # and associated library.
 platforms :mingw, :x64_mingw, :mswin, :jruby do
