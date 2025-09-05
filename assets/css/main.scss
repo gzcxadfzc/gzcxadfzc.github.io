@@ -4,16 +4,14 @@
 
 @charset "utf-8";
 
-@use "variables" with (
-  $base-url: "{{ site.baseurl }}"
-);
-@use "mixins";
-@use "extends";
+@import "variables";
+@import "mixins";
+@import "extends";
 
-@use "base";
-@use "layout";
-@use "site";
-@use "work";
-@use "blog";
-@use "post";
-@use "not_found";
+@import "base";
+@import "layout";
+@import "site";
+@import "work";
+@import "blog";
+@import "post";
+@import "not_found";
