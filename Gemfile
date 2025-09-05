@@ -6,6 +6,7 @@ gem "bay_jekyll_theme", "1.2.2"
 
 group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.12"
+  gem "jekyll-remote-theme"
 end
 
 platforms :mingw, :x64_mingw, :mswin, :jruby do
