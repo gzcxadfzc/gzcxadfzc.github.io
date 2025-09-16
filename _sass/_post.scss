@@ -40,9 +40,10 @@
 .post-content {
   margin-bottom: variables.$spacing-unit;
   width: 100%;
+
   h2 {
     font-size: 32px;
-
+    margin-top: 2em;
     @include mixins.media-query(variables.$on-mobile) {
       font-size: 28px;
     }
@@ -50,7 +51,7 @@
 
   h3 {
     font-size: 26px;
-
+    margin-top: 2em;
     @include mixins.media-query(variables.$on-mobile) {
       font-size: 22px;
     }
@@ -58,10 +59,23 @@
 
   h4 {
     font-size: 20px;
+    margin-top: 2em;
 
     @include mixins.media-query(variables.$on-mobile) {
       font-size: 18px;
     }
+  }
+
+  p {
+    font-size: 18px;
+  }
+
+  li {
+    font-size: 18px;
+  }
+
+  ul {
+    font-size: 18px;
   }
 }
 
@@ -76,7 +90,7 @@
 
 .post-languages {
   font-size: 13px;
-  font-family: Helvetica, sans-serif;
+  font-family: NanumSquareRound;
   margin-top: 30px;
   margin-bottom: 20px;
 

@@ -29,8 +29,11 @@ contact: yongsa0221@gmail.com
 <br>
 
 <div class="no-break" markdown="1">
+
 # 프로젝트
+
 ---
+
 </div>
 
 <div class="no-break" markdown="1">
@@ -41,7 +44,7 @@ contact: yongsa0221@gmail.com
 > ### 생성형 AI를 사용한 동화 제작 서비스
 > - 기간: 2024.1 ~ 2024.6 
 > - 인원: 3명
-> - 현재 상태: 중단
+> - 현재 상태: 배포 중단
 > - 역할: api 서버 개발
 </div>
 
@@ -58,13 +61,9 @@ contact: yongsa0221@gmail.com
 <br>
 
 ### 주요 기능
-[Redis 기반 생성형 AI context 유지](/404.html)
+[Redis 기반 사용자 진행상태 관리](/2024/08/21/littleWriter01#2-생성형-ai-프로젝트에서-사용하기)
 
-[동화 생성을 위한 생성형 AI 프롬프팅 및 요청 파이프라인 구성](/404.html)
-
-[계층형 구조](/404.html)
-
-[Spring Security기반 Oauth 인증](/404.html)
+[동화 생성을 위한 생성형 AI 프롬프팅 설계](/2024/08/21/littleWriter01#1-파이프라인-구성)
 
 ---
 </div>

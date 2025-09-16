@@ -72,5 +72,38 @@
   </script>
   <script async src="https://www.google-analytics.com/analytics.js"></script>
 
+  <!-- Mermaid -->
+  <script type = "module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+  // ZenUML 플러그인
+  import zenuml from 'https://cdn.jsdelivr.net/npm/@mermaid-js/mermaid-zenuml/dist/mermaid-zenuml.esm.min.mjs';
+  // Mermaid 초기화 전에 ZenUML 등록
+  await mermaid.registerExternalDiagrams([zenuml]);
 
+
+    document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("pre code.language-mermaid").forEach(block => {
+      const container = document.createElement("div");
+      container.className = "mermaid";
+      container.textContent = block.textContent;
+      block.parentNode.replaceWith(container);
+    });
+  });
+
+  mermaid.initialize({
+    startOnLoad:true,
+    theme: "base",
+    look: "handDrawn",
+    wrappingWidth: 200,
+    themeVariables: {
+      primaryColor: "#ededed",
+      secondaryColor: "#ffffff", 
+      tertiaryTextColor: "#0f0f0f", 
+      fontFamily: "NanumSquareRoundEB",
+    },
+    wrappingWidth: 260,
+    flowchart: { htmlLabels: true, useMaxWidth: true }
+  });
+  await mermaid.run({ querySelector: ".mermaid" });
+  </script>
 </head>
