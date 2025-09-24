@@ -417,3 +417,31 @@ pre {
 .zenuml {
   font-family: 'NanumSquareRoundEB' !important;
 }
+
+/* 일반 테이블에만 적용, 코드 블럭 안의 table은 제외 */
+table:not(pre table):not(code table) {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.5em 0;
+  font-size: 0.95rem;
+  font-family: 'NanumSquareRoundB';
+}
+
+table:not(pre table):not(code table) th,
+table:not(pre table):not(code table) td {
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+table:not(pre table):not(code table) th {
+  background-color: #4f4e4e;
+  color: #ffffff;
+}
+
+table:not(pre table):not(code table) tr:nth-child(even) td {
+  background-color: #f9f9f9;
+}
+table:not(pre table):not(code table) tr:nth-child(odd) td {
+  background-color: #ffffff;
+}
