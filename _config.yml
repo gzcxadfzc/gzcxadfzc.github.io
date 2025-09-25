@@ -50,9 +50,9 @@ sass:
 header:
   pages:
     - name: 홈
-      slug: /
-    - name: 작업
       slug: /work
+    - name: 작업
+      slug: /
     - name: 글
       slug: /blog
 

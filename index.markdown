@@ -97,13 +97,10 @@ contact: yongsa0221@gmail.com
 
 **API server - Java/Spring**
 
-[공통 인증 모듈 구현](/404.html)
+[공통 인증 모듈 구현](/2024/09/16/barlow#1-인증모듈)
 
-[생성형 AI요약 Batch작업 최적화](/404.html)
+[생성형 AI요약 Batch작업 최적화](/2024/09/16/barlow#2-ai를-통한-법안-요약-기능-추가하기)
 
-[DDD 기반 Clean architecture](/404.html) 
-
-[CQRS 패턴을 통한 조회 API 구현](/404.html)
 </div>
 
 <div class="no-break" markdown="1">
@@ -111,9 +108,7 @@ contact: yongsa0221@gmail.com
 
 **Application - Dart/Flutter**
 
-[Github actions를 통한 Play Store 트랙 자동 배포 환경 구성](/404.html)
+[Github actions를 통한 Play Store 트랙 자동 배포 환경 구성](https://ogongchill.github.io/posts/PlayStore%EB%B0%B0%ED%8F%AC/)
 
-[feature-first 구조에 따른 Clean Architecture구조](/404.html)
-
-[멀티 모듈을 통한 빌드 속도 개선](/404.html)
+[feature-first 구조에 따른 Clean Architecture구조](https://ogongchill.github.io/posts/%EB%B0%94%EB%A1%9C%EC%95%B1%EC%95%84%ED%82%A4%ED%85%8D%EC%B3%90/)
 </div>
