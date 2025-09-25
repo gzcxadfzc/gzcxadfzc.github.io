@@ -33,6 +33,7 @@ plugins:
   - jekyll-feed
 
 kramdown:
+  input: GFM
   footnote_backlink: "&#8617;&#xfe0e;"
   syntax_highlighter: rouge
   syntax_highlighter_opts: # Rouge Options › https://github.com/jneen/rouge#full-options
@@ -50,9 +51,9 @@ sass:
 header:
   pages:
     - name: 홈
-      slug: /work
-    - name: 작업
       slug: /
+    - name: 작업
+      slug: /work
     - name: 글
       slug: /blog
 
