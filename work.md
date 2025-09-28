@@ -27,6 +27,17 @@ contact: yongsa0221@gmail.com
 
 <br>
 <br>
+<br>
+
+## 소개
+
+>### 새로운 기술을 배우는 것을 좋아하는 개발자 입니다.
+>### Java/Spring 기반의 서버 구축과 Dart/Flutter 를 사용하여 앱 개발 경험이 있습니다.
+>### 생성형 AI를 통한 서비스를 제공하는 분야 관심이 많으며 코드 생산성을 높이는 방식에 관심이 있습니다.
+
+<br>
+<br>
+<br>
 
 # 프로젝트
 
@@ -106,7 +117,7 @@ graph TD
 <br>
 <br>
 
-## Barlow _[API서버](/404.html)_, _[앱](/404.html)_
+## Barlow _[API서버](https://github.com/ogongchill/barlow)_, _[앱](https://github.com/ogongchill/barlow-front)_
 > ### 국회 법안 조회 서비스
 > - 기간: 2025.1 ~  
 > - 인원: 2명
@@ -173,7 +184,7 @@ graph TD
 
 **[생성형 AI요약 Batch 작업](/2024/09/16/barlow#2-ai를-통한-법안-요약-기능-추가하기)**
 - AsyncItemProcessor, AsyncItemWriter기반 요약 요청 처리
-- Polling 정책 설정을 통한 작업 속도 최적화
+- Polling 정책과 스레드 설정을 통하여 기존 1+ 분에서 24초 정도로 최적화
 - 기존 `TodayBillJob`에 `Step`으로 요약 단계 추가
 
 <br>
