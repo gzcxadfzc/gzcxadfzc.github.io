@@ -260,35 +260,29 @@ blockquote {
 pre,
 code {
   font-size: 15px;
-  font-family: variables.$base-font-family;
-  word-spacing: 4px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   border: none;
   border-radius: 3px;
-  background-color: #333;
-  color: #fff;
 }
 
 code {
-  padding: 1px 5px;
-  background-color: #dddddd;
+  padding: 2px 2px;
+  background-color: #dedbdb;
   color: #333;
   font-weight: bold;
 }
 
-pre code {
-  background-color: transparent;
-  color: #fff;
-  font-weight: normal;
-}
-
 pre {
-  padding: 8px 12px;
+  padding: 12px 16px;
   overflow-x: auto;
+  border-radius: 6px;
 
   > code {
     border: 0;
-    padding-right: 0;
-    padding-left: 0;
+    padding: 0;
+    background-color: transparent;
+    color: inherit;
+    font-weight: normal;
   }
 }
 

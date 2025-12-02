@@ -3,8 +3,8 @@ layout: home
 title: 작업한 프로젝트 목록
 slug: /work
 profile_picture:
-  src: /assets/img/user/my-notion-face-portrait.png
-  alt: website picture
+  src: /assets/img/user/profile.jpg
+  alt: /assets/img/user/my-notion-face-portrait.png
 title: 백엔드 개발자 박순용 입니다.
 subtitle: 다양한 기술과 지식을 통해 육각형 인간이 되고 싶은 개발자 입니다.
 social:
@@ -47,7 +47,7 @@ contact: yongsa0221@gmail.com
 
 <br>
 
-## [LittleWriter](https://github.com/LittleWriterBloom/BE)
+## [LittleWriter](https://github.com/gzcxadfzc/BE)
 
 > ### 생성형 AI를 사용한 동화 제작 서비스
 > - 기간: 2024.1 ~ 2024.6 
@@ -66,22 +66,20 @@ contact: yongsa0221@gmail.com
 graph TD
 
 %% 그룹: controller
-    subgraph controller [app]
+    subgraph controller [api]
         app_api["controller"]
     end
 
 %% 그룹: domain
-    subgraph domain [domain]
-        book["book"]
-        character["character"]
-        auth["auth"]
+    subgraph domain [application/domain]
+        a["domain"]
     end
 
 %% 그룹: infra
     subgraph infra [infra]
-        open_ai_api["open_ai_api"]
-        jpa["jpa"]
-        redis["redis"]
+        ai["ai"]
+        storage[storage]
+        auth[auth]
     end
 ```
 
@@ -95,8 +93,8 @@ graph TD
 
 <br>
 
-## 주요 기능
-**[캐시 기반 사용자 진행상태 관리 기능 개발](/2024/08/21/littleWriter01#2-생성형-ai-프로젝트에서-사용하기)**
+## 기능 개발
+**[캐시 기반 사용자 진행상태 관리 기능](/2024/08/21/littleWriter01#2-생성형-ai-프로젝트에서-사용하기)**
 - 사용자의 "동화 만들기" 과정의 상태 기반 도메인 설계
 - Redis를 도입하여 사용자별 진행 상태를 캐싱 저장
 
@@ -108,6 +106,17 @@ graph TD
 - Redis에 저장된 이전 맥락(진행 상황)을 함께 전달하여 연속성 있는 스토리 생성
 - 파이프라인 최적화를 통해 생성시간을 1+ 분에서 30초 정도로 단축
 
+<br>
+
+**[트랜잭션 경계 설정을 통한 응답 속도 개선](/2025/11/19/littleWriter02#2-트랜잭션)**
+- `@Transactional` 내부 IO 작업 분리
+- 응답속도 평균 600ms -> 150ms로 개선 
+
+<br>
+
+**[JPA 연관관계 제거를 통한 조회 성능 개선](/2025/11/19/littleWriter02#3-책-조회-성능-개선)**
+- ORM 수준의 연관관계 제약에서 JPQL 기반 Projection을 통한 명시적 조회로 재설계
+- Lazy 로딩으로 발생하던 N+1 문제 제거 및 단일 쿼리로 일괄 조회를 통한 쿼리 최적화
 
 <br>
 
