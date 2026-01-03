@@ -26,6 +26,12 @@ contact: yongsa0221@gmail.com
 > 숭실대학교 글로벌미디어학부 : 2019 ~ 졸업 예정
 
 <br>
+
+## 자격증
+> **AWS Solutions Architect Associate** _2025.12 ~ 2028.12_
+
+![alt text](/assets/img/user/certificates/aws_saa.png){: width="100" height="100"}
+<br>
 <br>
 <br>
 
