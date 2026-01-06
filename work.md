@@ -23,7 +23,7 @@ certificates:
 contact: yongsa0221@gmail.com 
 ---
 ## 학업
-> 숭실대학교 글로벌미디어학부 : 2019 ~ 졸업 예정
+> 숭실대학교 글로벌미디어학부 : 2019 ~ 2026.2 졸업
 
 <br>
 
@@ -37,13 +37,22 @@ contact: yongsa0221@gmail.com
 
 ## 소개
 
->### 새로운 기술을 배우는 것을 좋아하는 개발자 입니다.
->### Java/Spring 기반의 서버 구축과 Dart/Flutter 를 사용하여 앱 개발 경험이 있습니다.
->### 생성형 AI를 통한 서비스를 제공하는 분야 관심이 많으며 코드 생산성을 높이는 방식에 관심이 있습니다.
+Java/Spring 기반 서버 개발 경험과 실제 서비스 성능 개선 이력을 보유한 신입 개발자입니다
+
+생성형 AI 파이프라인 최적화, 캐시 기반 상태 관리, 비동기 배치 처리 등을 통해 응답 속도 75% 개선, 처리 시간 60% 단축 등의 성과를 달성했습니다.
+
+서버 아키텍처 구축과 비즈니스 로직 설계를 통해 서비스를 개발한 경험이 있으며, Flutter를 사용한 클라이언트 개발도 경험하여, 서버–클라이언트 간 흐름을 전체적으로 이해하며 문제를 바라보는 능력을 갖추고 있습니다.
+
+다양한 기술과 도메인을 스스로 탐색하고 확장하는 것을 즐기며, “육각형 개발자”를 목표로 꾸준히 학습하고 개발하고 있습니다.
+
+협업에서는 팀원들과 문서 공유 하는 것을 중요시 생각하며 이를 위하여 다이어그램이나 시각 자료 등을 적극적으로 사용합니다.
+
 
 <br>
 <br>
 <br>
+
+<div class="no-break" markdown="1">
 
 # 프로젝트
 
@@ -65,7 +74,7 @@ contact: yongsa0221@gmail.com
 
 ## 프로젝트 소개
 
-![littleWriter](assets/img/work/little-writer-example02.jpg)
+![littleWriter](assets/img/work/little-writer-example02.jpg){: width="1000"}
 
 ### 프로젝트 구조
 ```mermaid
@@ -89,6 +98,9 @@ graph TD
     end
 ```
 
+</div>
+
+
 ### 사용 기술
 - API서버: `Java`, `Spring Boot`
 - 데이터베이스: `Mysql`, `JPA/hibernate`, `Redis`
@@ -108,21 +120,28 @@ graph TD
 
 **[동화 생성을 위한 생성형 AI 프롬프팅 파이프라인 구현](/2024/08/21/littleWriter01#1-파이프라인-구성)**
 - 사용자 입력에 따른 일관된 스토리 구조 + 삽화 + 질문 생성을 동시 생성
-- `@Async` 기반 비동기 처리
-- Redis에 저장된 이전 맥락(진행 상황)을 함께 전달하여 연속성 있는 스토리 생성
-- 파이프라인 최적화를 통해 생성시간을 1+ 분에서 30초 정도로 단축
+- Redis에 저장된 이전 맥락을 활용하여 연속성 있는 스토리 생성
+- 파이프라인 최적화를 통해 생성 시간 1분 → 30초로 50% 단축
+
 
 <br>
 
 **[트랜잭션 경계 설정을 통한 응답 속도 개선](/2025/11/19/littleWriter02#2-트랜잭션)**
 - `@Transactional` 내부 IO 작업 분리
-- 응답속도 평균 600ms -> 150ms로 개선 
+- 동화 저장 요청 응답 속도 600ms → 150ms로 75% 개선
 
 <br>
 
 **[JPA 연관관계 제거를 통한 조회 성능 개선](/2025/11/19/littleWriter02#3-책-조회-성능-개선)**
 - ORM 수준의 연관관계 제약에서 JPQL 기반 Projection을 통한 명시적 조회로 재설계
-- Lazy 로딩으로 발생하던 N+1 문제 제거 및 단일 쿼리로 일괄 조회를 통한 쿼리 최적화
+- N+ 문제 제거 및 단일 쿼리 일괄 조회로 쿼리 효율 50% 이상 향상
+
+<br>
+
+**[Redis를 이용한 사용자 동시 요청 제어]()**
+- '진행중인 동화 책' 단위의 Redis 엔티티를 SETNX 기반으로 동시성 제어
+- LLM 중복 호출 방지 및 도메인 엔티티의 정합성 보장
+
 
 <br>
 
@@ -199,21 +218,23 @@ graph TD
 
 **[생성형 AI요약 Batch 작업](/2024/09/16/barlow#2-ai를-통한-법안-요약-기능-추가하기)**
 - AsyncItemProcessor, AsyncItemWriter기반 요약 요청 처리
-- Polling 정책과 스레드 설정을 통하여 기존 1+ 분에서 24초 정도로 최적화
-- 기존 `TodayBillJob`에 `Step`으로 요약 단계 추가
+- Polling 정책 및 스레드 최적화로 처리 시간 1분 → 24초로 60% 단축
+
+
+<div class="no-break" markdown="1">
 
 <br>
 
 **Mobile Application - Dart/Flutter**
 
 **[Github actions를 통한 Play Store 트랙 자동 배포 환경 구성](https://ogongchill.github.io/posts/PlayStore%EB%B0%B0%ED%8F%AC/)**
-- github actions를 사용한 빌드 및 배포 완전 자동화
-- 빌드 버전 별 google play 트랙 배포 자동화
-
+- 빌드 및 배포 완전 자동화로 배포 리드타임 단축
+- 빌드 버전별 Google Play 트랙 자동 배포 구현
 
 **[feature-first 구조에 따른 Clean Architecture구조](https://ogongchill.github.io/posts/%EB%B0%94%EB%A1%9C%EC%95%B1%EC%95%84%ED%82%A4%ED%85%8D%EC%B3%90/)**
-- 로컬 환경에서 getIt에 의한 의존성 코드 생성 최적화를 통한 빌드 속도 개선
-- mvvm구조를 통한 관심사 분리
- 
+- Feature-first 구조의 Clean Architecture 적용
+- 모듈 분리에 따른 getIt 의존성 코드 생성 최적화를 통한 로컬 빌드 속도 개선
 
 <br>
+
+</div>
