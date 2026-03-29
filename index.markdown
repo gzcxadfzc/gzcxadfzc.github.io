@@ -71,7 +71,7 @@ contact: yongsa0221@gmail.com
 
 ## 프로젝트 소개
 
-![littleWriter](assets/img/work/little-writer-example02.jpg){: width="1000"}
+![littleWriter](assets/img/work/little-writer-example02.jpg){: width="500"}
 
 ### 사용 기술
 - API 서버: `Java`, `Spring Boot`
@@ -133,7 +133,7 @@ LittleWriter는 사용자의 입력을 바탕으로 동화와 삽화를 함께 �
 
 ## 프로젝트 소개
 
-![바로서비스](assets/img/work/barlow-example.png)
+![바로서비스](assets/img/work/barlow-example.png){: width="500"}
 
 ### 사용 기술
 - API 서버: `Java`, `Spring Boot`
@@ -181,7 +181,7 @@ LittleWriter는 사용자의 입력을 바탕으로 동화와 삽화를 함께 �
 
 ## 프로젝트 소개
 
-![구성도](assets/img/work/agentic-system.png)
+![구성도](assets/img/work/agentic-system.png){: width="500"}
 
 ### 사용 기술
 - 백엔드: `Python 3.12`, `AWS Lambda`, `SQS`, `DynamoDB`
