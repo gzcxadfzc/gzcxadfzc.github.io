@@ -51,7 +51,7 @@ sass:
 header:
   pages:
     - name: 홈
-      slug: /
+      slug: /work
     - name: 작업
       slug: /work
     - name: 글
