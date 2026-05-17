@@ -1,220 +1,285 @@
-# Ack Lambda 성능 분석 및 최적화
+# Performance 이슈 기록
 
 ---
 
-## 핵심 결론
+## [P1] GET /book/board/all — COUNT(*) Full Scan
 
-**Cold start duration 자체를 줄이는 것은 이 스택에서 의미 있는 개선이 불가능하다.
-올바른 접근은 cold start가 발생하지 않도록 Lambda를 warm 상태로 유지하는 것이다.**
+### 발견 경위
+k6 read 부하테스트(100 VU) 중 `GET /book/board/all` 요청이 timeout되며 서버가 응답 불가 상태에 빠짐.
+테스트 데이터 누적량: 약 130,000건.
+
+### 원인
+`BookJpaRepository.findAll(Pageable)` 사용 시 Spring Data JPA가 아래 두 쿼리를 항상 함께 실행:
+
+```sql
+-- 1. 실제 데이터 (LIMIT 적용, 빠름)
+SELECT * FROM book ORDER BY created_at DESC LIMIT 10 OFFSET 0
+
+-- 2. 전체 개수 (full scan, 느림)
+SELECT COUNT(*) FROM book
+```
+
+데이터가 많아질수록 COUNT(*) 쿼리가 선형적으로 느려지며, 100 VU 동시 요청 시 DB 커넥션 고갈 및 timeout 발생.
+
+### 영향 범위
+- `GET /api/v1/book/board/all` 엔드포인트
+- `BookRepositoryAdapter.retrieveThumbnails()`
+- `BookJpaRepository.findAll(Pageable)`
+
+### 해결 방안
+
+#### 방안 1. Slice 기반 커서 페이징으로 전환 (권장)
+`Page` 대신 `Slice`를 사용하면 COUNT 쿼리를 실행하지 않음.
+클라이언트는 "다음 페이지 있음/없음" 여부만 알 수 있고 전체 페이지 수는 알 수 없음.
+
+```java
+// BookJpaRepository
+Slice<BookJpaEntity> findAll(Pageable pageable);
+
+// BookRepositoryAdapter
+Slice<BookJpaEntity> entitySlice = bookJpaRepository.findAll(pageable);
+// entitySlice.hasNext() 로 다음 페이지 존재 여부 확인
+```
+
+#### 방안 2. COUNT 쿼리 분리 및 캐싱
+COUNT 쿼리를 별도로 분리하고 Redis 등으로 캐싱 (TTL 30초~1분).
+전체 건수가 필요한 경우 선택.
+
+```java
+@Query(value = "SELECT b FROM BookJpaEntity b",
+       countQuery = "SELECT COUNT(b.id) FROM BookJpaEntity b")
+Page<BookJpaEntity> findAll(Pageable pageable);
+```
+
+count 결과를 `@Cacheable`로 캐싱하여 매 요청마다 full scan 방지.
+
+#### 방안 3. created_at 인덱스 추가
+정렬 컬럼에 인덱스가 없으면 ORDER BY도 full scan. 인덱스 추가만으로도 개선 가능.
+
+```sql
+CREATE INDEX idx_book_created_at ON book(created_at DESC);
+```
+
+### 권장 적용 순서
+1. `idx_book_created_at` 인덱스 추가 (즉시 적용 가능, 리스크 낮음)
+2. `Slice` 기반 커서 페이징 전환 (API 스펙 변경 필요)
 
 ---
 
-## 측정 환경
+## [P2] GET /book/board/{id} — 동일 쿼리 이중 실행
 
-- Lambda: `barlow-slack-ack` (arm64 / Graviton, 256MB)
-- 트리거: Slack `/feat` 슬래시 커맨드 → Lambda Function URL
-- 측정 방법: CloudWatch REPORT 로그
+### 발견 경위
+`read-book.js` 부하테스트 코드 리뷰 및 정적 분석 중 발견.
 
----
+### 원인
+`BookService.retrieveByBookId()`에서 null 체크 후 동일 쿼리를 한 번 더 실행:
 
-## 실측 수치
-
-### Cold start vs Warm start (기준선 — 2026-03-29)
-
-| 구분 | Init Duration | Handler Duration | 합계 |
-|---|---|---|---|
-| Cold start (n=2 평균) | 908ms | 650ms | **1,558ms** |
-| Warm start (n=2 평균) | — | 316ms | **316ms** |
-| 차이 | +908ms | +334ms | **+1,242ms** |
-
-```
-Slack이 경험하는 latency (네트워크 ~150ms 포함):
-
-warm: ~466ms   ✓ 안전
-cold: ~1,708ms △ Slack 3초 제약 대비 margin 1.3초
-```
-
----
-
-## 문제 구조
-
-```
-월 30회 호출 → 호출 간격 길다 → 대부분 cold start
-cold start (~1,708ms) → Slack 3초 초과 위험 → timeout → retry → dedup 필요
-```
-
-dedup 레이어(pending-action, active-session)가 존재하는 근본 원인 중 하나가 cold start다.
-
----
-
-## 시도한 최적화와 결과
-
-### 시도 1 — Lazy Import (롤백)
-
-**가설**: 모듈 레벨 초기화를 handler 진입 시점으로 지연하면 Init Duration이 줄어든다.
-
-**결과**: `expired_trigger_id` 에러 발생. Init Duration 수치는 108ms로 감소했지만 동일한 작업이 handler 안으로 이동했을 뿐이고 wall-clock time은 오히려 증가했다.
-
-**왜 더 느려졌나 — 두 가지 근거:**
-
-① **Lambda Init Phase는 Handler Phase보다 CPU가 빠르다**
-
-Lambda는 Init Phase에 메모리 설정과 무관하게 2 vCPU를 무제한 할당한다. Handler Phase에서는 메모리에 비례해 CPU가 throttle된다. 256MB 기준 Handler Phase CPU는 Init Phase 대비 수 배 느리다. 동일한 import 작업이 Init에서는 빠르고 Handler에서는 느리다.
-
-> "Lambda grants your function's bootstrap code unthrottled access to two vCPUs, regardless of the function's configured memory."
-
-— [Lambda Cold Starts and Bootstrap Code (Luc van Donkersgoed, 2022)](https://lucvandonkersgoed.com/2022/04/08/lambda-cold-starts-and-bootstrap-code/)
-— [AWS Lambda execution environment lifecycle](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html)
-
-② **asyncio 이벤트 루프 안에서 동기 import는 루프 전체를 blocking한다**
-
-asyncio는 단일 스레드 + cooperative 모델이다. 루프가 실행 중인 상태에서 무거운 동기 import를 호출하면 yield point가 없으므로 루프 전체가 멈춘다.
-
-> "Blocking (CPU-bound) code should not be called directly. For example, if a function performs a CPU-intensive calculation for 1 second, all concurrent asyncio Tasks and IO operations would be delayed by 1 second."
-
-— [Python 공식 문서: Developing with asyncio](https://docs.python.org/3/library/asyncio-dev.html)
-— [BBC cloudfit: Mixing Synchronous and Asynchronous Code](https://bbc.github.io/cloudfit-public-docs/asyncio/asyncio-part-5.html)
-
----
-
-### 시도 2 — 패키지 분리 (완료, Init Duration 개선 없음)
-
-**가설**: Ack Lambda zip에 불필요하게 포함된 AI SDK(openai-agents, mcp)를 제거하면 Init Duration이 줄어든다.
-
-**분석 — import 체인 추적:**
-
-```
-Ack Lambda 실제 import: slack_bolt, pydantic, boto3, src.controller.*, src.domain.common.*
-                        → openai-agents, mcp 미사용
-
-Worker Lambda 실제 import: + openai-agents, mcp (executor.py 경로)
-```
-
-**패키지 크기 측정 결과:**
-
-```
-전체 패키지 (requirements-deploy.txt): 90MB
-Ack 전용  (requirements-ack.txt):      11MB
-
-주요 제거 대상:
-  openai + 의존성:  ~23MB
-  mcp:               ~2MB
-```
-
-**After 측정 결과 (11MB 패키지):**
-
-| 구분 | Before (90MB) | After (11MB) | 변화 |
-|---|---|---|---|
-| Init Duration 평균 | 908ms | 969ms | **유의미한 변화 없음** |
-| Handler Duration 평균 | 650ms | 718ms | 측정 분산 범위 내 |
-
-**왜 개선이 없었나:**
-
-Python은 실제로 `import`하는 모듈만 로드한다. openai-agents와 mcp는 zip에 존재했지만 Ack Lambda 코드에서 한 번도 import되지 않으므로 Init Duration에 영향이 없었다.
-
-**Init Duration의 실제 병목:**
-
-```
-pydantic_core  — Rust 컴파일 .so 파일 로딩         ~250ms
-slack_bolt     — 대형 Python 패키지                 ~250ms
-boto3 client 3개 생성                               ~150ms
-Python 런타임 시작 + src.* 컴파일                   ~250ms
-────────────────────────────────────────────────────────
-합계                                                ~900ms
-```
-
-이것들은 11MB 패키지와 90MB 패키지 모두에 동일하게 존재한다. 스택을 바꾸지 않는 한 Init Duration ~900ms는 이 시스템의 하한선이다.
-
-**패키지 분리의 실질적 가치**: Init Duration 개선은 없었지만 Ack/Worker 배포 독립성 확보, 빌드 시간 단축은 유효하다.
-
-커밋: `852201b`
-
----
-
-## 결론 — 올바른 접근 방향
-
-**Cold start duration 최적화는 한계에 도달했다.**
-
-| 접근 | 결과 |
-|---|---|
-| Lazy import | Init Duration 수치↓, wall-clock time↑, trigger_id 만료 → 역효과 |
-| 패키지 분리 | Init Duration 변화 없음 → import되는 패키지가 병목이므로 무효 |
-| 패키지 교체 | slack_bolt, pydantic_core를 더 가벼운 것으로 교체 → 스택 전면 교체 수준 |
-
-**올바른 방향은 cold start 빈도를 0에 가깝게 낮추는 것이다.**
-
-```
-현재: 월 30회 호출, 호출 간격 길다 → 거의 모든 요청이 cold start (1,708ms)
-목표: Lambda를 항상 warm 상태로 유지 → 모든 요청이 warm handler (466ms)
-```
-
-warm 상태의 handler 316ms는 Slack 3초 제약 대비 충분히 안전하다.
-cold start duration을 줄이는 것보다 cold start 자체를 없애는 것이 현실적이다.
-
----
-
-## 다음 단계 — EventBridge Keep-warm
-
-5분 간격 ping으로 Lambda를 warm 상태로 유지한다.
-Step 1에서 구현한 진입점 분리(`source == "aws.events"` 분기)가 이 ping을 처리한다.
-
-```hcl
-resource "aws_cloudwatch_event_rule" "keep_warm" {
-  name                = "barlow-ack-keep-warm"
-  schedule_expression = "rate(5 minutes)"
-}
-resource "aws_cloudwatch_event_target" "keep_warm" {
-  rule      = aws_cloudwatch_event_rule.keep_warm.name
-  target_id = "AckLambdaKeepWarm"
-  arn       = aws_lambda_function.ack.arn
-}
-resource "aws_lambda_permission" "allow_eventbridge" {
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.ack.function_name
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.keep_warm.arn
+```java
+// BookService.java
+public Book retrieveByBookId(String bookId) {
+    Book book = bookRepository.retrieveById(bookId);  // 1차 조회
+    if (book == null) {
+        throw BookException.notFound(bookId);
+    }
+    return bookRepository.retrieveById(bookId);  // 2차 조회 (불필요)
 }
 ```
 
-비용: 월 ~8,640회 ping → Lambda 무료 티어(월 1,000,000회) 내 **$0**
+`retrieveById()` 내부에서 실행되는 쿼리:
+```sql
+-- (1) book + character JOIN 쿼리
+SELECT b.id, b.user_id, b.title, ... , c.id, c.name, ...
+FROM book b INNER JOIN main_character c ON b.character_id = c.id
+WHERE b.id = ?
 
-**기대 효과:**
+-- (2) book_page 쿼리
+SELECT * FROM book_page WHERE book_id = ?
+```
 
-| 측정 항목 | 현재 | Keep-warm 적용 후 |
-|---|---|---|
-| Cold start 빈도 | ~100% | ~0% |
-| Slack 경험 latency | ~1,708ms (cold) | ~466ms (warm) |
-| Slack timeout 위험 | 존재 | 제거 |
+단건 조회 1회당 DB 쿼리 총 **4회** 발생 (위 2쌍이 두 번 실행).
+100 VU 기준 DB 요청 수 2배 증가.
+
+### 영향 범위
+- `GET /api/v1/book/board/{id}` 엔드포인트
+- `BookService.retrieveByBookId()`
+- `BookRepositoryAdapter.retrieveById()`
+
+### 해결 방안
+1차 조회 결과를 재사용:
+
+```java
+public Book retrieveByBookId(String bookId) {
+    Book book = bookRepository.retrieveById(bookId);
+    if (book == null) {
+        throw BookException.notFound(bookId);
+    }
+    return book;  // 이미 조회된 객체 반환
+}
+```
+
+### 기대 효과
+- `/book/board/{id}` DB 쿼리 수 50% 감소
+- 적용 난이도: 낮음 (1줄 수정)
 
 ---
 
-## 측정 방법
+## [P3] 외래 키 컬럼 인덱스 누락
 
-**CloudWatch Logs Insights:**
+### 발견 경위
+`read-book.js` 정적 분석 — `my_books`, `my_chars` 엔드포인트의 쿼리 경로 추적.
 
+### 원인
+JPA 엔티티에 `@Index` 어노테이션이 없고 별도 DDL 스크립트도 없음.
+아래 컬럼들이 FK로 사용되지만 인덱스 미생성 상태:
+
+| 테이블 | 컬럼 | 사용 쿼리 | 영향 엔드포인트 |
+|--------|------|-----------|----------------|
+| `book` | `user_id` | `findAllByUserId(Long)` | GET /book/my |
+| `book` | `created_at` | `ORDER BY created_at DESC` | GET /book/board/all |
+| `book_page` | `book_id` | `findAllByBookId(String)` | GET /book/board/{id} |
+| `main_character` | `member_id` | `findByMemberId(Long)` | GET /character/my |
+
+데이터가 적을 때는 full scan이 빠르지만, 데이터 누적 시 선형 저하 발생.
+현재 book 테이블 130,000건 기준으로 이미 `/board/all` timeout 경험(P1).
+
+### 해결 방안
+
+#### JPA 엔티티에 @Table 인덱스 추가
+
+```java
+// BookJpaEntity.java
+@Entity
+@Table(name = "book", indexes = {
+    @Index(name = "idx_book_user_id",    columnList = "user_id"),
+    @Index(name = "idx_book_created_at", columnList = "created_at DESC")
+})
+public class BookJpaEntity { ... }
+
+// BookPageJpaEntity.java
+@Entity
+@Table(name = "book_page", indexes = {
+    @Index(name = "idx_book_page_book_id", columnList = "book_id")
+})
+public class BookPageJpaEntity { ... }
+
+// CharacterJpaEntity.java
+@Entity
+@Table(name = "main_character", indexes = {
+    @Index(name = "idx_character_member_id", columnList = "member_id")
+})
+public class CharacterJpaEntity { ... }
 ```
-fields @timestamp, @duration, @initDuration
-| filter @type = "REPORT"
-| stats
-    count()                        as total,
-    sum(ispresent(@initDuration))  as cold_count,
-    avg(@initDuration)             as avg_init_ms,
-    avg(@duration)                 as avg_handler_ms
+
+#### 또는 직접 SQL 실행 (prod 환경, ddl-auto: validate)
+
+```sql
+CREATE INDEX idx_book_user_id       ON book(user_id);
+CREATE INDEX idx_book_created_at    ON book(created_at DESC);
+CREATE INDEX idx_book_page_book_id  ON book_page(book_id);
+CREATE INDEX idx_character_member_id ON main_character(member_id);
 ```
 
-**Cold start 강제 유발 (n회 반복 측정):**
+### 기대 효과
+- `GET /book/my`: O(N) full scan → O(log N) index scan
+- `GET /character/my`: O(N) full scan → O(log N) index scan
+- `GET /book/board/{id}` 내 book_page 조회 개선
 
-```bash
-for i in $(seq 1 5); do
-  aws lambda update-function-configuration \
-    --function-name barlow-slack-ack \
-    --environment Variables={PROBE=$i} \
-    --region ap-northeast-2 --no-cli-pager > /dev/null
-  aws lambda wait function-updated \
-    --function-name barlow-slack-ack --region ap-northeast-2
-  aws lambda invoke \
-    --function-name barlow-slack-ack \
-    --payload '{"source":"aws.events"}' \
-    --region ap-northeast-2 /dev/null --no-cli-pager
-done
+---
+
+## [P4] 조회 엔드포인트 캐싱 미적용
+
+### 발견 경위
+`read-book.js` 정적 분석 — Redis 설정 확인 시.
+
+### 원인
+Redis가 인프라에 구성되어 있고 `RedisConfig`도 존재하지만,
+조회 API에는 캐싱이 전혀 적용되지 않아 매 요청마다 DB 쿼리 발생.
+
+현재 Redis 활용 현황:
+- `BookInProgressRedisEntity`: 책 진행 중 상태 저장 (쓰기 경로)
+- `BookPageRedisEntity`: 페이지 임시 저장 (쓰기 경로)
+- **읽기 경로 캐싱: 없음**
+
+`read-book.js` 기준 100 VU × 4개 엔드포인트 = 초당 수백 건의 동일 DB 쿼리 발생.
+
+### 해결 방안
+
+#### 방안 1. Spring Cache + Redis (@Cacheable)
+
+```java
+// RedisCacheConfig.java
+@Configuration
+@EnableCaching
+public class RedisCacheConfig {
+
+    @Bean
+    public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+        RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
+            .entryTtl(Duration.ofSeconds(30))
+            .disableCachingNullValues();
+
+        return RedisCacheManager.builder(connectionFactory)
+            .cacheDefaults(defaultConfig)
+            .withCacheConfiguration("book-thumbnails",
+                RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(30)))
+            .withCacheConfiguration("book-detail",
+                RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(5)))
+            .build();
+    }
+}
+
+// BookService.java
+@Cacheable(value = "book-detail", key = "#bookId")
+public Book retrieveByBookId(String bookId) { ... }
+
+@Cacheable(value = "book-thumbnails", key = "#query.sort + '_' + #query.index")
+public PageResult<BookThumbnail> retrieveBookThumbnails(BookRetrieveQuery query) { ... }
 ```
+
+#### 캐시 무효화 전략
+- `book-detail`: 책 수정/삭제 시 `@CacheEvict`
+- `book-thumbnails`: TTL 만료 방식 (30초) — 신규 책 반영 지연 허용
+
+### 기대 효과
+- Cache hit 시 DB 쿼리 0회
+- 100 VU 부하 시 DB 쿼리 수 대폭 감소
+- `board_all_duration` p(95) 임계값 500ms 달성 가능성 높아짐
+
+---
+
+## read-book.js 부하 테스트 시나리오 요약
+
+### 테스트 구성
+
+| 항목 | 값 |
+|------|-----|
+| 도구 | k6 |
+| VU 수 | 최대 100 |
+| 총 시간 | 4분 (30s 워밍업 + 1m 증가 + 2m 유지 + 30s 쿨다운) |
+| setup | 100개 유저/책 사전 생성 |
+| 주요 패턴 | 공개 목록 → 단건 조회 → 내 책 → 내 캐릭터 |
+
+### 측정 대상 엔드포인트 및 임계값
+
+| 엔드포인트 | 메트릭 | 임계값 | 인증 |
+|-----------|--------|--------|------|
+| GET /api/v1/book/board/all | `board_all_duration` p(95) | < 500ms | 불필요 |
+| GET /api/v1/book/board/{id} | `book_detail_duration` p(95) | < 300ms | 불필요 |
+| GET /api/v1/book/my | `my_books_duration` p(95) | < 300ms | JWT 필요 |
+| GET /api/v1/character/my | `my_chars_duration` p(95) | < 300ms | JWT 필요 |
+| 전체 | `error_rate` | < 5% | - |
+
+### setup 단계 문제점
+`setup()`에서 100개 유저 생성 시 각각 4개 API 순차 호출 (signup → character → init → complete).
+AI/이미지 처리가 실제 환경에서는 수 초가 소요되므로 `load-test` 프로파일 필수.
+
+---
+
+## 개선 우선순위 요약
+
+| 우선순위 | 이슈 | 적용 난이도 | 기대 효과 |
+|---------|------|------------|----------|
+| P1 (완료 분석) | /board/all COUNT(*) full scan | 중 | 매우 큼 (timeout 해소) |
+| P2 | /board/{id} 이중 쿼리 | 낮음 | 중간 (DB 요청 50% 감소) |
+| P3 | FK 컬럼 인덱스 누락 | 낮음 | 큼 (데이터 증가 시 선형 저하 방지) |
+| P4 | 조회 캐싱 미적용 | 중 | 매우 큼 (DB 부하 대폭 감소) |
