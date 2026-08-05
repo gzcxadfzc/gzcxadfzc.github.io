@@ -41,6 +41,14 @@
   margin-bottom: variables.$spacing-unit;
   width: 100%;
 
+  h1 {
+    font-size: 36px;
+    margin-top: 2em;
+    @include mixins.media-query(variables.$on-mobile) {
+      font-size: 30px;
+    }
+  }
+
   h2 {
     font-size: 32px;
     margin-top: 2em;
@@ -63,6 +71,24 @@
 
     @include mixins.media-query(variables.$on-mobile) {
       font-size: 18px;
+    }
+  }
+
+  h5 {
+    font-size: 18px;
+    margin-top: 2em;
+
+    @include mixins.media-query(variables.$on-mobile) {
+      font-size: 16px;
+    }
+  }
+
+  h6 {
+    font-size: 16px;
+    margin-top: 2em;
+
+    @include mixins.media-query(variables.$on-mobile) {
+      font-size: 15px;
     }
   }
 
@@ -102,6 +128,70 @@
 
 div.footnotes {
   font-size: 80%;
+}
+
+.post-toc {
+  display: none;
+  position: fixed;
+  top: 140px;
+  right: 24px;
+  width: 220px;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  padding: 16px;
+  background-color: #fdfdfd;
+  border: 1px solid variables.$color-grey-light;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.6;
+
+  ol {
+    margin: 0;
+    padding-left: 1em;
+    list-style: none;
+  }
+
+  li {
+    margin-bottom: 4px;
+    border-radius: 0;
+  }
+
+  li.post-toc-h1 {
+    margin-left: 0;
+  }
+
+  li.post-toc-h2 {
+    margin-left: 0.9em;
+  }
+
+  li.post-toc-h3 {
+    margin-left: 1.8em;
+  }
+
+  li.post-toc-h4 {
+    margin-left: 2.7em;
+  }
+
+  li.post-toc-h5 {
+    margin-left: 3.6em;
+  }
+
+  li.post-toc-h6 {
+    margin-left: 4.5em;
+  }
+
+  a {
+    color: variables.$color-grey-dark;
+
+    &.active {
+      color: variables.$color-brand;
+      font-weight: 700;
+    }
+  }
+
+  @media screen and (min-width: 1400px) {
+    display: block;
+  }
 }
 
 .draft-banner {

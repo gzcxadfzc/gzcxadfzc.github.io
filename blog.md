@@ -2,7 +2,8 @@
 layout: blog
 title: 글
 slug: /blog
+pagination:
+  enabled: true
+  indexpage: 'blog'
+  extension: 'html'
 ---
-
-This is an example of a "Blog" page, displaying a list of posts.
-<br />

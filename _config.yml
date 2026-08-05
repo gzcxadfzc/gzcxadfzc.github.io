@@ -31,6 +31,31 @@ github_username:  jekyll
 # Build settings
 plugins:
   - jekyll-feed
+  - jekyll-paginate-v2
+
+pagination:
+  enabled: true
+  per_page: 30
+  permalink: '/page/:num/'
+  title: ':title - page :num'
+  sort_field: 'date'
+  sort_reverse: true
+  trail:
+    before: 2
+    after: 2
+
+autopages:
+  enabled: true
+  tags:
+    enabled: true
+    layouts:
+      - 'tag_page.html'
+    title: ':tag'
+    permalink: '/tag/:tag/'
+  categories:
+    enabled: false
+  collections:
+    enabled: false
 
 kramdown:
   input: GFM
@@ -42,7 +67,7 @@ kramdown:
     span:
       line_numbers: false
     block:
-      line_numbers: true
+      line_numbers: false
       start_line: 1
 
 sass:

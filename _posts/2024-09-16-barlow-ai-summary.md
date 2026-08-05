@@ -3,8 +3,6 @@ layout: post
 title: "Barlow - AI를 통한 법안 요약 기능"
 date: 2024-09-16 11:00:40
 ---
-* TOC
-{:toc}
 
 <br>
 

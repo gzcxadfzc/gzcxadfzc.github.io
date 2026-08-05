@@ -64,6 +64,11 @@
   <link rel="canonical" href="{{ page_url }}"/>
   <link rel="shortcut icon" href="{{ "/favicon.ico" | absolute_url }}" type="image/x-icon"/>
 
+  <!-- Mermaid 손글씨 폰트 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poor+Story&display=swap" rel="stylesheet">
+
   <!-- Google Analytics -->
   <script>
     window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
@@ -80,30 +85,38 @@
   // Mermaid 초기화 전에 ZenUML 등록
   await mermaid.registerExternalDiagrams([zenuml]);
 
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: "base",
+    look: "handDrawn",
+    wrappingWidth: 260,
+    themeVariables: {
+      primaryColor: "#ffffff",
+      primaryBorderColor: "#4a4a4a",
+      primaryTextColor: "#4a4a4a",
+      secondaryColor: "#ffffff",
+      tertiaryTextColor: "#4a4a4a",
+      textColor: "#4a4a4a",
+      lineColor: "#4a4a4a",
+      fontFamily: "Poor Story",
+    },
+    flowchart: { htmlLabels: true, useMaxWidth: true }
+  });
 
-    document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", async () => {
     document.querySelectorAll("pre code.language-mermaid").forEach(block => {
       const container = document.createElement("div");
       container.className = "mermaid";
       container.textContent = block.textContent;
       block.parentNode.replaceWith(container);
     });
-  });
 
-  mermaid.initialize({
-    startOnLoad:true,
-    theme: "base",
-    look: "handDrawn",
-    wrappingWidth: 200,
-    themeVariables: {
-      primaryColor: "#ededed",
-      secondaryColor: "#ffffff", 
-      tertiaryTextColor: "#0f0f0f", 
-      fontFamily: "NanumSquareRoundEB",
-    },
-    wrappingWidth: 260,
-    flowchart: { htmlLabels: true, useMaxWidth: true }
+    // Poor Story가 다 로드된 뒤에 렌더링해야 mermaid가 실제 글자 폭으로
+    // 라벨 크기를 계산해서, 폰트 교체 후 줄바꿈이 밀려 겹치지 않는다.
+    await document.fonts.load('16px "Poor Story"');
+    await document.fonts.ready;
+
+    await mermaid.run({ querySelector: ".mermaid" });
   });
-  await mermaid.run({ querySelector: ".mermaid" });
   </script>
 </head>

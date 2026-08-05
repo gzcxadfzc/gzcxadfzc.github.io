@@ -2,23 +2,173 @@
 @use "mixins" as mixins;
 
 .blog-post-list {
-  .blog-post-date {
-    width: 6em;
-    color: #777;
-    display: block;
-    float: left;
+  margin: 0 0 variables.$spacing-unit;
+  padding: 0.5rem 1.75rem;
+  list-style: none;
+  background-color: #fffdf7;
+  background-image: url('../img/others/paper_texture.png');
+  background-repeat: repeat-y;
+  background-size: 100% 400px;
+  border: 1px solid #e2ddc8;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
 
-    @include mixins.media-query(variables.$on-mobile) {
-      display: block;
-      float: none;
-      color: #333;
-      font-size: 11px;
-      margin-top: 14px;
-    }
+.blog-post-entry {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  column-gap: 12px;
+  padding: 14px 0;
+  margin-bottom: 0;
+  border-bottom: 1px dashed rgba(120, 170, 220, 0.4);
+  border-radius: 0;
+  font-family: 'Poor Story', variables.$base-font-family;
+
+  &:last-child {
+    border-bottom: none;
   }
 
-  .blog-post-title {
-    font-size: 100%;
-    letter-spacing: normal;
+  @include mixins.media-query(variables.$on-mobile) {
+    flex-direction: column;
+    align-items: flex-start;
+    row-gap: 4px;
   }
+}
+
+.blog-post-date {
+  width: 5.5em;
+  flex-shrink: 0;
+  color: #999;
+  font-size: 14px;
+
+  @include mixins.media-query(variables.$on-mobile) {
+    width: auto;
+    font-size: 12px;
+  }
+}
+
+.blog-post-title {
+  font-size: 120%;
+  letter-spacing: normal;
+  color: #333;
+}
+
+.blog-post-tags {
+  margin-left: auto;
+  font-size: 12px;
+  font-family: variables.$base-font-family;
+
+  @include mixins.media-query(variables.$on-mobile) {
+    margin-left: 0;
+  }
+}
+
+.blog-post-tag {
+  color: variables.$color-grey;
+
+  &:hover {
+    color: variables.$color-brand;
+  }
+
+  &:not(:last-child) {
+    margin-right: 6px;
+  }
+}
+
+.tag-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: variables.$spacing-unit;
+}
+
+.tag-nav-item {
+  display: inline-block;
+  padding: 4px 12px;
+  border: 1px solid variables.$color-grey-light;
+  border-radius: 16px;
+  font-size: 13px;
+  color: variables.$color-text;
+
+  &:hover {
+    border-color: variables.$color-brand;
+    text-decoration: none;
+  }
+
+  &.active {
+    background-color: variables.$color-brand;
+    border-color: variables.$color-brand;
+    color: #fff;
+  }
+}
+
+.tag-nav-count {
+  color: variables.$color-grey;
+  font-size: 11px;
+
+  .active & {
+    color: #fff;
+  }
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: variables.$spacing-unit;
+  padding-top: calc(variables.$spacing-unit / 2);
+  border-top: 1px solid variables.$color-grey-light;
+}
+
+.pagination-arrow,
+.pagination-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 6px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: 'Poor Story', variables.$base-font-family;
+  color: #4a4a4a;
+  border: 1px solid transparent;
+
+  &:hover {
+    background-color: #fffdf7;
+    border-color: #e2ddc8;
+    text-decoration: none;
+  }
+}
+
+.pagination-arrow {
+  font-size: 18px;
+
+  &.disabled {
+    color: #ddd;
+    pointer-events: none;
+  }
+}
+
+.pagination-num.active {
+  background-color: #4a4a4a;
+  background-image: none;
+  color: #fff;
+  font-weight: 700;
+  border-color: #4a4a4a;
+
+  &:hover {
+    background-color: #4a4a4a;
+  }
+}
+
+.pagination-ellipsis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  color: variables.$color-grey-light;
 }

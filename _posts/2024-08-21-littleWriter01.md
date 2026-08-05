@@ -3,8 +3,6 @@ layout: post
 title: "생성형 AI를 사용한 동화 생성 서비스"
 date: 2024-08-21 10:00:40
 ---
-* TOC
-{:toc}
 
 <br>
 

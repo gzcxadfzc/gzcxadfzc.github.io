@@ -1,0 +1,11 @@
+{% if site.tags.size > 0 %}
+<nav class="tag-nav">
+  <a href="{{ site.baseurl }}/blog" class="tag-nav-item{% if page.pagination.tag == nil %} active{% endif %}">전체</a>
+  {% assign sorted_tags = site.tags | sort %}
+  {% for tag in sorted_tags %}
+    <a href="{{ site.baseurl }}/tag/{{ tag[0] | slugify }}/" class="tag-nav-item{% if page.pagination.tag == tag[0] %} active{% endif %}">
+      {{ tag[0] }} <span class="tag-nav-count">{{ tag[1].size }}</span>
+    </a>
+  {% endfor %}
+</nav>
+{% endif %}

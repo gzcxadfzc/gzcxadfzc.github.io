@@ -122,6 +122,10 @@ figure {
 /**
  * Basic styling
  */
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: variables.$base-font-family;
   font-size: variables.$base-font-size;
@@ -329,19 +333,73 @@ pre {
 
 /**
  * Syntax highlighting with line numbers
+ *
+ * Rouge's line_numbers:true wraps code in a <table> with the gutter and
+ * code each in their own <pre>. Without resetting those nested <pre>s,
+ * the generic `pre { padding; overflow-x; border-radius }` rule above
+ * applies to all three <pre> levels, producing double padding/boxes and
+ * two independent horizontal scrollbars that can drift out of sync.
  */
 .highlight {
-  .lineno {
-    color: rgba(255, 255, 255, 0.3);
-    margin-right: 10px;
-    padding-right: 10px;
-    border-right: 1px solid rgba(255, 255, 255, 0.2);
-    user-select: none;
-  }
-  
   pre {
     background-color: #333;
     color: #fff;
+  }
+
+  .rouge-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    td {
+      padding: 0;
+      vertical-align: top;
+    }
+
+    pre {
+      padding: 0;
+      margin: 0;
+      border-radius: 0;
+      overflow: visible;
+      background-color: transparent;
+    }
+  }
+
+  .rouge-gutter {
+    padding-right: 10px;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    user-select: none;
+
+    .lineno {
+      color: rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  .rouge-code {
+    padding-left: 10px;
+  }
+}
+
+/**
+ * plaintext / language-less code blocks get the notebook-paper treatment
+ * used for mermaid diagrams, instead of the dark syntax-highlight theme.
+ */
+.language-plaintext {
+  pre.highlight {
+    background-color: #fffdf7;
+    background-image: url('../img/others/paper_texture.png');
+    background-repeat: repeat-y;
+    background-size: 100% 400px;
+    font-size: 17px;
+    line-height: 26px;
+    color: #4a4a4a;
+    border: 1px solid #e2ddc8;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
+    code {
+      font-family: 'Poor Story', variables.$base-font-family;
+      font-weight: 600;
+      -webkit-text-stroke: 0.15px currentColor;
+    }
   }
 }
 
@@ -384,14 +442,16 @@ pre {
 }
 
 .mermaid {
-  padding: 1rem;
-  margin: 1rem; 
+  padding: 1.5rem 1.75rem;
+  margin: 1.5rem auto;
   text-align: left;
-  //   background-image:
-  //   linear-gradient(to right, #ddd 1px, transparent 1px),
-  //   linear-gradient(to bottom, #ddd 1px, transparent 1px);
-  // background-size: 20px 20px; /* 격자 간격 */
-  // background-color: #fff;  
+  background-color: #fffdf7;
+  background-image: url('../img/others/paper_texture.png');
+  background-repeat: repeat-y;
+  background-size: 100% 400px;
+  border: 1px solid #e2ddc8;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 
@@ -408,8 +468,23 @@ pre {
 .mermaid svg { max-width: 100%; height: auto; overflow: visible;
  }
 
+/* 4B 연필 느낌: 더 두껍고, 살짝 흐린 흑연 선 */
+.mermaid svg .node path,
+.mermaid svg .node rect,
+.mermaid svg .node polygon,
+.mermaid svg .node circle {
+  stroke-width: 2.5px !important;
+  stroke-opacity: 0.85 !important;
+}
+
+.mermaid svg .edgePath path,
+.mermaid svg .flowchart-link {
+  stroke-width: 2px !important;
+  stroke-opacity: 0.8 !important;
+}
+
 .zenuml {
-  font-family: 'NanumSquareRoundEB' !important;
+  font-family: 'Poor Story' !important;
 }
 
 /* 일반 테이블에만 적용, 코드 블럭 안의 table은 제외 */
@@ -429,7 +504,7 @@ table:not(pre table):not(code table) td {
 }
 
 table:not(pre table):not(code table) th {
-  background-color: #4f4e4e;
+  background-color: #4a4a4a;
   color: #ffffff;
 }
 
