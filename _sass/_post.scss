@@ -42,39 +42,30 @@
   width: 100%;
 
   h1 {
-    font-size: 36px;
+    font-size: 30px;
     margin-top: 2em;
     @include mixins.media-query(variables.$on-mobile) {
-      font-size: 30px;
+      font-size: 26px;
     }
   }
 
   h2 {
-    font-size: 32px;
+    font-size: 26px;
     margin-top: 2em;
     @include mixins.media-query(variables.$on-mobile) {
-      font-size: 28px;
+      font-size: 24px;
     }
   }
 
   h3 {
-    font-size: 26px;
+    font-size: 22px;
     margin-top: 2em;
     @include mixins.media-query(variables.$on-mobile) {
-      font-size: 22px;
+      font-size: 20px;
     }
   }
 
   h4 {
-    font-size: 20px;
-    margin-top: 2em;
-
-    @include mixins.media-query(variables.$on-mobile) {
-      font-size: 18px;
-    }
-  }
-
-  h5 {
     font-size: 18px;
     margin-top: 2em;
 
@@ -83,12 +74,21 @@
     }
   }
 
-  h6 {
+  h5 {
     font-size: 16px;
     margin-top: 2em;
 
     @include mixins.media-query(variables.$on-mobile) {
       font-size: 15px;
+    }
+  }
+
+  h6 {
+    font-size: 15px;
+    margin-top: 2em;
+
+    @include mixins.media-query(variables.$on-mobile) {
+      font-size: 14px;
     }
   }
 
@@ -102,6 +102,12 @@
 
   ul {
     font-size: 18px;
+  }
+
+  hr {
+    margin: 2.5em 0;
+    border: none;
+    border-top: 1px solid variables.$color-grey-light;
   }
 }
 

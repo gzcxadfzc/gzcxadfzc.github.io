@@ -1,0 +1,146 @@
+---
+layout: post
+title: "Barlow Automation: Human-in-the-Loop 워크플로우와 Slack 3초 제약 대응"
+date: 2026-03-26 09:33:00
+tags: ["barlow", "serverless"]
+---
+
+# Slack 3초 응답 제한 안에서 Human-in-the-Loop 이슈 자동화 시스템 구현하기
+
+---
+
+## Situation (상황)
+
+Slack 자연어 요청을 입력받아 코드베이스 분석, 기존 이슈 검토, 초안 생성, GitHub 이슈 생성까지 수행하는 내부 도구가 필요했습니다. 관련 없는 기존 이슈 연결, 중복 이슈 생성, 품질이 낮은 초안의 즉시 등록 같은 잘못된 판단이 확대되면 자동화로 얻는 이점보다 복구 비용이 더 커지는 위험이 있었습니다.
+
+핵심 과제는 AI 연동 자체가 아니라, 이 위험을 통제하기 위한 `human-in-the-loop` 워크플로우를 Lambda 기반 서버리스 환경에서 구현하면서 Slack의 3초 응답 제한도 동시에 만족시키는 것이었습니다.
+
+---
+
+## Task (과제)
+
+1. AI가 탐색과 초안 작성을 담당하고 최종 판단은 사용자가 내리는 `human-in-the-loop` 구조를 설계할 것
+2. 사용자 선택 대기 구간이 여러 번 존재하는 장기 워크플로우를 상태를 잃지 않고 Lambda 환경에서 안전하게 재개 가능하게 만들 것
+3. Slack이 요구하는 3초 이내 HTTP 200 응답과, 수초~수십 초가 걸리는 AI 분석/초안 생성 작업을 동시에 만족시킬 것
+4. Slack retry와 SQS의 at-least-once 전달 특성으로 인한 중복 실행을 차단할 것
+
+---
+
+## Action (행동)
+
+### 1) Human-in-the-loop을 상태 머신으로 구현
+
+워크플로우는 다음 순서로 구성했습니다.
+
+1. 사용자 요청 수신
+2. 관련 BC 탐색
+3. 기존 이슈 탐색 및 관계 후보 제시
+4. 사용자 선택 대기
+5. 이슈 초안 생성
+6. 사용자 최종 확인
+7. GitHub 이슈 생성
+
+이 흐름은 단일 요청-응답으로 종료되지 않고 사용자 선택 대기 구간이 여러 번 존재합니다. 메모리에 상태를 유지한 채 프로세스를 붙잡는 방식은 Lambda 환경과 맞지 않아, 워크플로우를 명시적 상태 머신으로 모델링했습니다.
+
+`Step Graph`는 각 단계를 노드로 표현하고, 각 노드는 `CONTINUE`, `WAIT_FOR_USER`, `STOP` 중 하나의 제어 신호를 가집니다. 선택 근거는 다음과 같습니다.
+
+- 사람 입력이 필요한 지점을 코드에서 명시적으로 드러낼 수 있습니다.
+- 새 워크플로우를 추가할 때 런타임을 수정하지 않고 그래프 정의만 추가하면 됩니다.
+
+조건문으로 단계 전환을 이어 붙이는 방식도 가능했지만, 이 경우 사람 입력 대기, 재개 이벤트, 종료 조건이 분산됩니다. 반면 상태 머신으로 표현하면 중단 지점, 재개 조건, 종료 조건이 고정되어 Lambda 실행이 여러 번 끊기는 환경에서 추적성과 유지보수성이 더 높습니다.
+
+실제 구현에서도 `feat_issue`는 `find_relevant_bc -> find_relevant_issue -> wait_issue_decision -> generate_issue_draft -> wait_confirmation -> create_github_issue` 순서로 흐릅니다. `reject_duplicate`, `extend_existing`, `block_existing`, `accept`, `reject` 같은 사용자 액션은 `RESUME_MAP`으로 다음 step에 매핑했습니다. 사용자 입력은 UI 이벤트가 아니라 상태 전이 신호로 처리했습니다.
+
+상태 저장소는 DynamoDB로 구성하되, DynamoDB가 다음 단계를 결정하도록 두지는 않았습니다.
+
+- 다음 step: SQS 메시지의 `event_type`이 결정
+- DynamoDB: BC 후보, 기존 이슈 후보, 초안 등 누적 컨텍스트만 저장
+
+역할 분리 목적은 재시도 안정성 확보였습니다. 같은 메시지가 다시 전달돼도 같은 단계로 복원되고, 상태 저장소와 라우팅 로직이 뒤엉키는 문제도 줄일 수 있습니다.
+
+실제 저장 단위는 `WorkflowInstance`였습니다. `workflow_id`, `status`, `current_step`, `pending_action_token`, Slack 식별자, TTL, 워크플로우별 `state`를 함께 저장했습니다. DynamoDB의 역할은 캐시가 아니라 중단 지점과 재개 문맥의 복원이었습니다.
+
+#### 1.1) Redis가 아닌 DynamoDB를 선택한 이유
+
+필요한 저장 기능은 고성능 캐시 조회가 아니라 `세션 상태 저장`, `TTL 기반 만료`, `조건부 쓰기`, `재시도 시 동일 키 보장`이었습니다. 기능만 보면 Redis와 DynamoDB 모두 가능했지만, 운영 조건은 크게 달랐습니다.
+
+가장 큰 차이는 비용이었습니다. ElastiCache는 운영비가 맞지 않아 제외했습니다. EC2 `t3.micro`에 Redis를 직접 올리는 방안도 검토했지만 상시 인스턴스 비용이 발생합니다. 반면 DynamoDB on-demand는 저빈도 워크로드에서 사용량 기준으로 과금되므로 더 저렴했습니다.
+
+- Redis: 메모리 기반, 상시 인스턴스 운영 필요, 이 워크로드에는 비용 대비 효용이 낮음
+- DynamoDB: 요청 기반 과금, TTL과 조건부 쓰기 지원, 저빈도 서버리스 워크로드에 비용 구조가 유리함
+
+운영 복잡도도 달랐습니다. Redis를 EC2에 직접 올리면 프로세스 관리, 재시작, 백업, 장애 대응을 직접 책임져야 합니다. DynamoDB는 완전관리형이어서 Lambda, SQS 중심 구조와 더 잘 맞았습니다.
+
+실제 테이블 설계도 DynamoDB의 특성과 잘 맞았습니다.
+
+- `barlow-workflow`: 워크플로우 상태 저장, TTL 24시간
+- `barlow-pending-action`: 멱등성 보장, TTL 1시간
+- `barlow-active-session`: 채널+유저 기준 활성 세션 관리, TTL 24시간
+
+결론적으로 이 시스템에서는 "가장 빠른 저장소"보다 "필요한 기능을 충족하면서 운영비와 운영 부담이 가장 낮은 저장소"가 더 적합했습니다. Redis를 배제한 이유는 기능 부족이 아니라 비용과 운영 부담 대비 과한 선택이었기 때문입니다.
+
+#### 1.2) 중복 실행 제어
+
+Slack retry와 SQS의 at-least-once 전달 특성이 겹치면 동일 요청이 중복 처리될 수 있어, 두 개의 dedup 레이어를 두었습니다.
+
+- `pending-action`: Slack `action_ts` 기준 조건부 쓰기로 동일 액션의 중복 처리 차단
+- `active-session`: `channel_id#user_id` 기준으로 동일 사용자의 동시 세션 차단
+
+동일 이벤트 재처리와 동일 사용자의 세션 충돌은 다른 문제입니다. `pending-action`만으로는 동시 세션을 막을 수 없고, `active-session`만으로는 Slack retry를 정밀하게 차단하기 어렵습니다.
+
+구현도 이 구분을 그대로 따랐습니다. `pending-action`은 Slack `view_id` 또는 `action_ts`를 `dedup_id`로 사용했고, `active-session`은 `{channel_id}#{user_id}` 키로 진행 중인 워크플로우를 하나로 제한했습니다.
+
+### 2) Slack 3초 제한 대응 — Ack/Worker Lambda 분리
+
+Slack은 이벤트 전송 후 3초 안에 HTTP 200을 받지 못하면 timeout으로 간주하고 재시도합니다. 반면 코드베이스 탐색, AI 호출, 초안 생성은 수초에서 수십 초가 걸려, 단일 Lambda에서 Slack 응답과 실제 작업을 함께 처리하는 구조는 성립하지 않았습니다.
+
+해결 방식은 Ack Lambda와 Worker Lambda 분리였습니다.
+
+- Ack Lambda: Slack 이벤트 수신, 모달 오픈, SQS 적재, 즉시 200 응답
+- Worker Lambda: SQS 트리거 기반 비동기 실행, AI 분석, 초안 생성, GitHub 이슈 생성
+
+이 구조는 성능 최적화가 아니라 실행 모델 대응입니다. Lambda는 `handler()`가 끝나면 실행 컨텍스트가 종료되므로 "빠른 응답"과 "긴 작업"을 다른 실행 경로로 분리해야 했습니다.
+
+실제 이벤트도 이 분리를 따릅니다. 새 워크플로우 시작은 `pipeline_start`로 적재되고, 이후 사용자 버튼 액션은 `accept`, `reject`, `extend_existing`, `block_existing` 같은 resume 이벤트로 다시 적재됩니다. Worker Lambda는 이를 받아 `WorkflowRuntime.start()` 또는 `.resume()`을 호출합니다.
+
+#### 2.1) trigger_id 제약
+
+Ack Lambda를 순수 Producer로 둘 수는 없었습니다. Slack의 `trigger_id`는 발급 후 3초 안에 사용해야 하므로, `views_open` 호출을 Worker로 넘길 수 없었습니다.
+
+따라서 역할을 다음처럼 나눴습니다.
+
+- Ack Lambda: 모달 오픈처럼 즉시 처리해야 하는 동기 작업 담당
+- Worker Lambda: 분석과 초안 생성처럼 시간이 걸리는 작업 담당
+
+즉, Ack Lambda의 역할은 단순 큐 생산자가 아니라 Event Controller에 가깝습니다.
+
+#### 2.2) cold start 최적화 시도와 결론
+
+Ack Lambda의 평균 측정값은 다음과 같았습니다.
+
+| 구분 | Init Duration | Handler Duration | 합계 |
+|---|---|---|---|
+| Cold start | 908ms | 650ms | 1,558ms |
+| Warm start | - | 316ms | 316ms |
+
+네트워크 지연 약 150ms를 포함하면 Slack 체감 지연은 warm 상태에서 약 466ms, cold 상태에서 약 1,708ms였습니다. 절대값은 3초 이내였지만, 월 30회 미만의 저빈도 워크로드라 대부분의 요청이 cold start에 가까웠고, 실제 위험은 평균 성능보다 cold start 빈도에서 발생했습니다.
+
+**시도 1. Lazy import** — lazy import를 적용해 초기화를 handler 내부로 미뤘습니다. `Init Duration`은 908ms에서 108ms 수준으로 감소했지만, 실제로는 import 비용이 handler 구간으로 이동했을 뿐이었고 `expired_trigger_id`가 발생했습니다. Lambda는 init phase에서 메모리와 무관하게 2 vCPU를 활용하지만 handler phase는 256MB 설정에 맞춰 CPU가 제한되고, 동기 import가 asyncio 루프 안에서 실행되면 이벤트 루프 전체를 block하기 때문이었습니다. 즉 lazy import는 `Init Duration`만 개선했고 전체 작업 시간은 오히려 증가시켰습니다.
+
+**시도 2. 패키지 경량화** — Ack Lambda 패키지에서 불필요한 패키지를 제거해 배포 크기를 줄였지만 `Init Duration` 평균은 908ms에서 969ms로 거의 변하지 않았습니다. Ack Lambda는 `openai-agents`, `mcp`를 import하지 않았기 때문에, 패키지 크기 감소가 초기화 시간 개선으로 이어지지 않았습니다.
+
+두 시도 모두 애플리케이션 내부 최적화만으로는 cold start 극복에 한계가 있음을 확인시켜, 아키텍처 레벨 대응으로 EventBridge 기반 keep-warm 전략을 적용했습니다.
+
+- 방식: 5분 주기 ping으로 Lambda 실행 환경 유지
+- 비용: 월 약 8,640회 호출, Lambda 무료 티어 내 처리 가능
+- 기대 효과: cold 기준 1,708ms에서 warm 기준 466ms 수준으로 지연 안정화
+
+---
+
+## Result (결과)
+
+- EventBridge keep-warm 전략으로 Ack Lambda 체감 지연을 cold 기준 1,708ms → warm 기준 466ms 수준으로 안정화하여 Slack의 3초 응답 제한을 안정적으로 충족했습니다.
+- keep-warm ping은 월 약 8,640회 호출로 Lambda 무료 티어 내에서 추가 비용 없이 처리됩니다.
+- `human-in-the-loop` 상태 머신 구조로 확인 버튼 하나가 아니라 `WAIT 상태`, `상태 저장`, `재개 이벤트`, `중복 제어`를 포함한 시스템으로 구현하여, 관련 없는 이슈 연결·중복 이슈 생성 같은 자동화 리스크를 사용자 최종 확인 단계에서 차단했습니다.
+- `pending-action` / `active-session` 이중 dedup 레이어로 Slack retry 재처리와 동일 사용자의 동시 세션 충돌을 각각 분리해서 차단했습니다.
+- 핵심 결론: Slack 3초 제한의 해법은 코드 미세 최적화가 아니라 `즉시 응답 경로와 장기 실행 경로 분리`, `trigger_id의 Ack 처리`, `cold start 빈도 제어`였습니다.

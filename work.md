@@ -91,32 +91,32 @@ LittleWriter는 사용자의 입력을 바탕으로 동화와 삽화를 함께 �
 
 이 프로젝트에서는 사용자 흐름을 상태 기반으로 재정의하고, 생성형 AI 호출을 파이프라인으로 조직하는 작업에 집중했습니다.
 
-**[캐시 기반 사용자 진행상태 관리 기능](/2024/08/21/littleWriter01#2-생성형-ai-프로젝트에서-사용하기)**
+**[캐시 기반 사용자 진행상태 관리 기능](/2024/08/21/littleWriter01-star#23-진행-상태bookinprogress-저장소-선택)**
 - 동화 생성 과정을 상태 기반 도메인으로 재설계
 - Redis를 활용해 사용자별 진행 상태와 문맥을 캐싱 저장
 
 <br>
 
-**[동화 생성을 위한 생성형 AI 프롬프팅 파이프라인 구현](/2024/08/21/littleWriter01#1-파이프라인-구성)**
+**[동화 생성을 위한 생성형 AI 프롬프팅 파이프라인 구현](/2024/08/21/littleWriter01-star#1-생성-파이프라인-반복-설계)**
 - GPT와 이미지 생성 모델을 조합한 파이프라인 구조 설계
 - 이전 문맥을 재사용해 연속성 있는 스토리 생성
 - 생성 시간 `1분 -> 30초`, 약 `50%` 단축
 
 <br>
 
-**[트랜잭션 경계 설정을 통한 응답 속도 개선](/2025/11/19/littleWriter02#2-트랜잭션)**
+**[트랜잭션 경계 설정을 통한 응답 속도 개선](/2025/11/19/littleWriter02-star#2-트랜잭션-경계-재설정--io를-트랜잭션-밖으로)**
 - `@Transactional` 내부 IO 작업 분리
 - 저장 요청 응답 속도 `600ms -> 150ms`, 약 `75%` 개선
 
 <br>
 
-**[JPA 연관관계 제거를 통한 조회 성능 개선](/2025/11/19/littleWriter02#3-책-조회-성능-개선)**
+**[JPA 연관관계 제거를 통한 조회 성능 개선](/2025/11/19/littleWriter02-star#3-책-조회-성능-개선--n1-제거)**
 - JPQL Projection 기반 명시적 조회로 재설계
 - N+1 문제 제거 및 단일 쿼리 중심 구조로 변경
 
 <br>
 
-**[Redis를 이용한 사용자 동시 요청 제어](/2025/11/21/littleWriterSetnx)**
+**[Redis를 이용한 사용자 동시 요청 제어](/2025/11/21/littleWriterSetnx-star)**
 - Redis `SETNX` 기반 동시성 제어 구조 설계
 - LLM 중복 호출 방지 및 도메인 정합성 확보
 
@@ -155,13 +155,13 @@ LittleWriter는 사용자의 입력을 바탕으로 동화와 삽화를 함께 �
 
 **API Server - Spring Boot**
 
-**[공통 인증 모듈 구현](/2024/09/16/barlow#1-인증모듈)**
+**[공통 인증 모듈 구현](/2024/09/16/barlow-star#1-인증-방식-확장을-위한-credentialauthenticator-추상화)**
 - Credential 기반 `Authenticator` 인터페이스로 전략 패턴 설계
 - RSA 기반 암호화로 서명과 인증 책임 분리
 
 <br>
 
-**[생성형 AI 요약 Batch 작업](/2024/09/16/barlow#2-ai를-통한-법안-요약-기능-추가하기)**
+**[생성형 AI 요약 Batch 작업](/2024/09/16/barlow-star#2-ai-법안-요약-기능-설계-원칙)**
 - `AsyncItemProcessor`, `AsyncItemWriter` 기반 비동기 요약 처리
 - Polling 정책 및 스레드 최적화
 - 처리 시간 `1분+ -> 24초`, 약 `60%` 단축
@@ -200,14 +200,14 @@ Slack 슬래시 커맨드로 기능 요청을 입력하면, AI가 GitHub 코드�
 
 기존 프로젝트의 방식은 AI 호출이 애플리케이션 내부 실행 흐름에 직접 묶여 있어 병목이 발생했고, 재시도, 상태 관리, 사용자 확인 로직도 함께 복잡해졌습니다. 이를 이벤트 기반 구조를 통해 `human-in-the-loop` 워크플로우와 Slack의 3초 응답 제한을 동시에 만족시키는 구조를 만드는 데 집중했습니다. 
 
-**[Human-in-the-Loop 기반 Agentic 워크플로우 설계](/2026/03/26/agent#1-human-in-the-loop을-어떻게-시스템으로-구현했는가)**
+**[Human-in-the-Loop 기반 Agentic 워크플로우 설계](/2026/03/26/agent-star#1-human-in-the-loop을-상태-머신으로-구현)**
 - `Step Graph` 기반 상태 머신 설계
 - `WorkflowInstance`, `RESUME_MAP`으로 중단 지점과 재개 흐름 명시화
 - `pending-action`, `active-session` 이중 dedup 구조로 중복 실행 제어
 
 <br>
 
-**[Slack 3초 제한 문제](/2026/03/26/agent#2-slack의-3초-제한을-어떻게-해결했는가)**
+**[Slack 3초 제한 문제](/2026/03/26/agent-star#2-slack-3초-제한-대응--ackworker-lambda-분리)**
 - Worker Lambda는 SQS 기반 비동기 분석과 이슈 생성 담당
 - `trigger_id` 제약 때문에 Ack를 단순 producer가 아닌 Event Controller로 설계
 - coldstart 최적화 전략 및 keep-warm 전략 수립을 통한 사용자 응답속도개선 `1,708ms` > `466ms`
