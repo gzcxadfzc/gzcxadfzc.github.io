@@ -1,6 +1,154 @@
 @use "variables" as variables;
 @use "mixins" as mixins;
 
+.page-content-details {
+  h1 {
+    font-size: 30px;
+    margin-top: 2.5em;
+    margin-bottom: 0.6em;
+
+    @include mixins.media-query(variables.$on-mobile) {
+      font-size: 26px;
+    }
+  }
+
+  h2 {
+    font-size: 24px;
+    margin-top: 2em;
+    margin-bottom: 0.5em;
+
+    @include mixins.media-query(variables.$on-mobile) {
+      font-size: 22px;
+    }
+  }
+
+  h3 {
+    font-size: 17px;
+    color: variables.$color-grey-dark;
+    margin-top: 1.2em;
+    margin-bottom: 0.5em;
+  }
+
+  p, li {
+    font-size: 17px;
+    line-height: 1.6;
+  }
+
+  img {
+    max-width: 100%;
+    border: #999 1px solid;
+    border-radius: 4px;
+  }
+
+  hr {
+    margin: 2em 0;
+    border: none;
+    border-top: 1px solid variables.$color-grey-light;
+  }
+
+  br + br {
+    display: none;
+  }
+}
+
+.profile-main {
+  display: flex;
+  flex-direction: column;
+
+  hr {
+    margin: 1.4em 0;
+    border: none;
+    border-top: 1px solid variables.$color-grey-light;
+  }
+
+  h2 {
+    font-size: 19px;
+    margin: 0 0 12px;
+  }
+}
+
+.profile-heading {
+  h1 {
+    margin: 0 0 4px;
+  }
+}
+
+.profile-subtitle {
+  color: variables.$color-grey-dark;
+  font-size: 1.5em;
+  font-weight: 500;
+}
+
+.tech-stack-group {
+  margin-bottom: 12px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: variables.$color-grey-dark;
+    margin: 0 0 6px;
+  }
+}
+
+.tech-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tech-chip {
+  background: variables.$color-grey-light;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: variables.$color-text;
+}
+
+.education-row {
+  margin-bottom: 4px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .muted {
+    margin-left: 8px;
+  }
+}
+
+.cert-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.cert-badge {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.cert-name {
+  font-weight: 700;
+  font-size: 15px;
+  display: inline;
+}
+
+.muted {
+  color: variables.$color-grey-dark;
+  font-size: 13px;
+}
+
 .profile-pic {
   float: right;
   width: 202px;
