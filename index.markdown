@@ -24,7 +24,6 @@ education:
     period: 2019 ~ 2026.2 졸업
 certifications:
   - name: AWS Solutions Architect Associate
-    period: 2025.12 ~ 2028.12
     image: /assets/img/user/certificates/aws_saa.png
   - name: Certified Kubernetes Application Developer
     image: /assets/img/user/certificates/ckad-certified-kubernetes-application-developer.png
@@ -36,7 +35,7 @@ contact: yongsa0221@gmail.com
 
 안정적인 시스템을 구축하고, 서비스 규모에 맞게 구조를 최적화하는 일에 집중해왔습니다.
 
- 실사용자가 있는 서비스를 기준으로 인프라와 배포 파이프라인을 설계하고 안정화하는 데 특히 관심이 있습니다. baro 서비스에서는 MAU 2,000 · DAU 150 규모로 실제 사용자가 이용하는 서비스를 대상으로 스키마 재설계, 인프라 안정화, 배포 파이프라인 구축을 담당하며, 크래시 원인 규명부터 Blue/Green 배포 전환까지 서비스 안정성을 직접 책임졌습니다.
+ 실사용자가 있는 서비스를 기준으로 인프라와 배포 파이프라인을 설계하고 안정화하는 데 특히 관심이 있습니다. baro 서비스에서는 MAU 2,000 · DAU 150 규모로 실제 사용자가 이용하는 서비스를 대상으로 스키마 재설계, 인프라 안정화, 배포 파이프라인 구축을 담당하며, 크래시 원인 규명부터 Blue/Green 배포 전환등의 서비스 안정성을 개선  경험이 있습니다.
 
  LLM과 같은 예측하기 어려운 작업도 시스템 경계 안으로 가져와 통제하는 설계에 꾸준히 도전해왔습니다. 생성형 AI 서비스에서는 파이프라인과 트랜잭션 경계를 조정해 응답 속도와 품질을 함께 개선했고, 의안 조회 플랫폼에서는 예측 불가능한 생성 작업을 배치 시스템 안에 안전하게 편입시켰습니다. 최근에는 Slack 기반 agentic 시스템을 직접 설계하며, AI 호출을 애플리케이션 로직이 아닌 인프라 수준에서 제어하는 구조까지 확장했습니다.
 
@@ -57,7 +56,7 @@ contact: yongsa0221@gmail.com
 ## theSociety (baro-backend)
 
 > ### 정치 플랫폼 '바로' 백엔드 — 인프라·데이터·배포 안정화
-> - 기간: 2026.3 ~ (진행중)
+> - 기간: 2026.3 ~ 
 > - 역할: 백엔드/인프라 개발
 > - 도메인: 지방선거 인물·행정구역 정보 서비스
 > - 규모: MAU 2,000 · DAU 150 (실서비스 운영)
@@ -98,7 +97,7 @@ contact: yongsa0221@gmail.com
 <br>
 <br>
 
-## Barlow Automation[저장소](https://github.com/ogongchill/barlow-automation)
+## Barlow Automation
 
 > ### Slack 기반 Agentic 이슈 생성 시스템
 > - 기간: 2026.3
@@ -141,12 +140,11 @@ Slack 슬래시 커맨드로 기능 요청을 입력하면, AI가 GitHub 코드�
 <br>
 <br>
 
-## Barlow _[API서버](https://github.com/ogongchill/barlow)_, _[앱](https://github.com/ogongchill/barlow-front)_
+## Barlow 
 
 > ### 국회 법안 조회 서비스
 > - 기간: 2025.1 ~ 2026.2
 > - 인원: 2명
-> - [Google Play](https://play.google.com/store/apps/details?id=com.barlow.front) 배포중
 > - 역할: API 서버 개발, 앱 개발 및 스토어 관리
 
 ### 프로젝트 소개
@@ -181,7 +179,7 @@ Slack 슬래시 커맨드로 기능 요청을 입력하면, AI가 GitHub 코드�
 <br>
 <br>
 
-## [LittleWriter](https://github.com/gzcxadfzc/BE)
+## [LittleWriter]
 
 > ### 생성형 AI를 사용한 동화 제작 서비스
 > - 기간: 2024.1 ~ 2024.6
