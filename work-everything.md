@@ -3,8 +3,8 @@ layout: home
 title: 작업한 프로젝트 목록
 slug: /work
 profile_picture:
-  src: /assets/img/user/profile.jpg
-  alt: /assets/img/user/my-notion-face-portrait.png
+  src: /assets/img/user/my-notion-face-portrait.png
+  alt: 박순용 프로필 사진
 title: 백엔드 개발자 박순용 입니다.
 subtitle: 다양한 기술과 지식을 통해 육각형 인간이 되고 싶은 개발자 입니다.
 social:

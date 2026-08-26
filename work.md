@@ -1,10 +1,11 @@
 ---
 layout: home
+permalink: /
 title: 프로젝트 경험
-slug: /work2
+slug: /
 profile_picture:
-  src: /assets/img/user/profile.jpg
-  alt: /assets/img/user/my-notion-face-portrait.png
+  src: /assets/img/user/my-notion-face-portrait.png
+  alt: 박순용 프로필 사진
 title: 개발자 박순용 입니다
 subtitle: 
 social:
@@ -16,7 +17,7 @@ techStacks:
   - name: 언어/프레임워크
     values: ["Java/Spring Boot", "Dart/Flutter"]
   - name: 데이터베이스
-    values: ["MySQL", "PostgreSQL", "Redis"]
+    values: ["MySQL", "PostgreSQL"]
   - name: 인프라/클라우드
     values: ["AWS", "Docker", "Terraform"]
 education:
@@ -28,6 +29,11 @@ certifications:
   - name: Certified Kubernetes Application Developer
     image: /assets/img/user/certificates/ckad-certified-kubernetes-application-developer.png
     period: ""
+  - name: HashiCorp Certified Terraform Associate
+    image: /assets/img/user/certificates/hashicorp-certified-terraform-associate-004.png
+    period: ""
+  - name: 정보처리기사
+    image: /assets/img/user/certificates/정보처리기사.png
 contact: yongsa0221@gmail.com 
 ---
 
@@ -62,8 +68,8 @@ contact: yongsa0221@gmail.com
 > - 규모: MAU 2,000 · DAU 150 (실서비스 운영)
 
 ### 사용 기술
-- 백엔드: `Java`, `Spring Boot`, `PostgreSQL`
-- 인프라: `AWS ASG/CodeBuild/ECR/ALB`, `Docker`, `OrbStack`, `Terraform`
+- 백엔드: `Kotlin`, `Spring Boot`, `PostgreSQL`
+- 인프라: `AWS`, `Docker`, `Terraform`
 
 <br>
 
@@ -109,9 +115,8 @@ contact: yongsa0221@gmail.com
 ![구성도](assets/img/work/agentic-system.png){: width="500"}
 
 ### 사용 기술
-- 백엔드: `Python 3.12`, `AWS Lambda`, `SQS`, `DynamoDB`
-- 연동: `Slack Bolt`, `OpenAI Agents SDK`, `GitHub MCP`
-- 인프라: `Terraform`, `GitHub Actions`
+- `OpenAI Agents SDK`, `GitHub MCP`
+- 인프라: `AWS`, `Terraform`
 
 <br>
 
@@ -154,8 +159,8 @@ Slack 슬래시 커맨드로 기능 요청을 입력하면, AI가 GitHub 코드�
 ### 사용 기술
 - API 서버: `Java`, `Spring Boot`
 - 앱: `Dart`, `Flutter`
-- 데이터베이스: `Mysql`, `JPA/Hibernate`
-- 배포: `AWS EC2`
+- 데이터베이스: `Mysql`, `JPA`
+- 인프라: `AWS`
 
 <br>
 

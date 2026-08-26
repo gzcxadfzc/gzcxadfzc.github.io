@@ -14,7 +14,7 @@
           {% else %}
             {% assign page_link = "/" | append: page.name | downcase %}
           {% endif %}
-          {% assign page_link = page_link | absolute_url %}
+          {% assign page_link = page_link | relative_url %}
           <a class="page-link" href="{{ page_link }}">
             {{- page.name -}}
           </a>
